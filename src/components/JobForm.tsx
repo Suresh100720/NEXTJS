@@ -15,6 +15,16 @@ export default function JobForm({ onClose, jobToEdit }: { onClose: () => void, j
   const [isDirty, setIsDirty] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+    if (jobToEdit) {
+      setTitle(jobToEdit.title || '');
+      setDepartment(jobToEdit.department || '');
+      setType(jobToEdit.type || '');
+      setExperience(jobToEdit.experience || '');
+      setStatus(jobToEdit.status || '');
+    }
+  }, [jobToEdit]);
+
   const roleOptions = [
     'Frontend Developer',
     'Backend Developer',
@@ -105,6 +115,7 @@ export default function JobForm({ onClose, jobToEdit }: { onClose: () => void, j
               <select
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                required
                 className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none ${title ? 'text-slate-900' : 'text-slate-400'}`}
               >
                 <option value="" disabled hidden>Select job title...</option>
@@ -119,6 +130,7 @@ export default function JobForm({ onClose, jobToEdit }: { onClose: () => void, j
               <select
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
+                required
                 className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none ${department ? 'text-slate-900' : 'text-slate-400'}`}
               >
                 <option value="" disabled hidden>Select department...</option>
@@ -133,6 +145,7 @@ export default function JobForm({ onClose, jobToEdit }: { onClose: () => void, j
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
+                required
                 className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none ${status ? 'text-slate-900' : 'text-slate-400'}`}
               >
                 <option value="" disabled hidden>Select status...</option>
@@ -147,6 +160,7 @@ export default function JobForm({ onClose, jobToEdit }: { onClose: () => void, j
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value)}
+                required
                 className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none ${type ? 'text-slate-900' : 'text-slate-400'}`}
               >
                 <option value="" disabled hidden>Select type...</option>
@@ -164,6 +178,7 @@ export default function JobForm({ onClose, jobToEdit }: { onClose: () => void, j
               <select
                 value={experience}
                 onChange={(e) => setExperience(e.target.value)}
+                required
                 className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none ${experience ? 'text-slate-900' : 'text-slate-400'}`}
               >
                 <option value="" disabled hidden>Select experience...</option>

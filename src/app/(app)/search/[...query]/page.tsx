@@ -45,7 +45,12 @@ export default async function SearchResultsPage({
                   </span>
                 </div>
                 <h3 className="text-lg font-black text-slate-900 mb-1">{job.title}</h3>
-                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">{job.department} • {job.type}</p>
+                <div className="flex flex-col gap-1">
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{job.department} • {job.type}</p>
+                  <p className="text-[10px] text-indigo-500 font-black uppercase tracking-widest">
+                    Experience: {job.experience && job.experience !== 'Fresher' ? `${job.experience} Yrs` : 'Fresher'}
+                  </p>
+                </div>
                 <Link href="/jobs" className="mt-6 block text-center py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-xl text-xs font-black transition-all">
                   View in Jobs
                 </Link>

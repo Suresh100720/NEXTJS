@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
-  Menu, X, LayoutDashboard, Briefcase, Users, Search, Info, 
+  Menu, X, LayoutDashboard, Briefcase, Users, Search, 
   ChevronLeft, ChevronRight, Bell, Settings, LogOut, User
 } from 'lucide-react';
 
@@ -24,7 +24,7 @@ export default function Shell({ children, modal }: { children: React.ReactNode, 
     { name: 'Jobs', href: '/jobs', icon: <Briefcase className="w-5 h-5" /> },
     { name: 'Candidates', href: '/candidates', icon: <Users className="w-5 h-5" /> },
     { name: 'Search', href: '/search', icon: <Search className="w-5 h-5" /> },
-    { name: 'Docs', href: '/docs', icon: <Info className="w-5 h-5" /> },
+
   ];
 
   return (
@@ -84,10 +84,7 @@ export default function Shell({ children, modal }: { children: React.ReactNode, 
 
           <div className="flex items-center gap-6">
              <div className="flex items-center gap-3">
-                <div className="text-right">
-                   <p className="text-xs font-black text-slate-900 leading-none">Admin Recruit</p>
-                   <p className="text-[10px] font-bold text-slate-400 mt-1">Super Admin</p>
-                </div>
+
                 <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center">
                    <User className="w-5 h-5 text-indigo-600" />
                 </div>

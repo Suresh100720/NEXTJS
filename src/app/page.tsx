@@ -20,12 +20,7 @@ export default function Home() {
         >
           Enter Dashboard
         </Link>
-        <Link 
-          href="/docs/intro" 
-          className="px-8 py-4 bg-white border border-slate-200 hover:bg-slate-50 rounded-2xl font-bold text-lg text-slate-900 transition-all shadow-sm"
-        >
-          Read Docs
-        </Link>
+
       </div>
 
       <div className="pt-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-left w-full max-w-5xl">

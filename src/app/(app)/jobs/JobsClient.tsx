@@ -90,7 +90,7 @@ export default function JobsClient({ initialJobs }: { initialJobs: any[] }) {
                     <span className="opacity-40">📍</span> {job.type || 'Full-time'}
                   </div>
                   <div className="flex items-center gap-2.5 text-slate-400 text-sm font-medium">
-                    <span className="opacity-40">⏳</span> Experience: {job.experience || 'Fresher'}
+                    <span className="opacity-40">⏳</span> Experience: {job.experience && job.experience !== 'Fresher' ? `${job.experience} Yrs` : 'Fresher'}
                   </div>
                 </div>
 

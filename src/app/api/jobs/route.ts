@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Job from '@/models/Job';
+import { revalidatePath } from 'next/cache';
 
 export async function GET() {
   try {
@@ -18,6 +19,8 @@ export async function POST(req: Request) {
     const body = await req.json();
     const job = new Job(body);
     const savedJob = await job.save();
+    revalidatePath('/jobs');
+    revalidatePath('/dashboard');
     return NextResponse.json(savedJob, { status: 201 });
   } catch (error) {
     return NextResponse.json({ message: (error as Error).message }, { status: 400 });
