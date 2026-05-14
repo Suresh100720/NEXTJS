@@ -52,14 +52,29 @@ export default async function CandidateDetailPage({
           <section className="bg-white border border-slate-200 p-8 rounded-[32px] shadow-sm">
             <h2 className="text-2xl font-black mb-6 text-slate-900 tracking-tight">Experience</h2>
             <div className="space-y-8">
-              {[1, 2].map((i) => (
-                <div key={i} className="border-l-4 border-slate-100 pl-8 space-y-2 relative">
-                  <div className="absolute -left-1.5 top-0 w-3 h-3 bg-indigo-500 rounded-full border-2 border-white shadow-sm"></div>
-                  <h3 className="text-lg font-black text-slate-800">Senior Developer at TechCorp</h3>
-                  <p className="text-sm text-slate-400 font-bold">2021 — Present</p>
-                  <p className="text-slate-600 leading-relaxed">Led the migration of core services to a microservices architecture, improving scalability by 40% and reducing latency by 200ms.</p>
-                </div>
-              ))}
+              {(() => {
+                const currentYear = new Date().getFullYear();
+                let expYears = 0;
+                if (candidate.experience && candidate.experience !== 'Fresher') {
+                  expYears = parseInt(candidate.experience) || 0;
+                }
+                const startYear = currentYear - expYears;
+                const experienceText = expYears > 0 ? `${startYear} — Present` : 'Fresher / Recent Graduate';
+                const roleTitle = expYears > 0 ? `Experienced ${candidate.role}` : `Entry-Level ${candidate.role}`;
+                
+                return (
+                  <div className="border-l-4 border-slate-100 pl-8 space-y-2 relative">
+                    <div className="absolute -left-1.5 top-0 w-3 h-3 bg-indigo-500 rounded-full border-2 border-white shadow-sm"></div>
+                    <h3 className="text-lg font-black text-slate-800">{roleTitle}</h3>
+                    <p className="text-sm text-slate-400 font-bold">{experienceText}</p>
+                    <p className="text-slate-600 leading-relaxed">
+                      {expYears > 0 
+                        ? `Demonstrated expertise and consistent growth over ${candidate.experience} years of professional experience in the industry. Highly skilled in core technologies and best practices related to the role.`
+                        : `Highly motivated and eager to apply academic knowledge and foundational skills to real-world projects. Fast learner with a strong passion for the industry.`}
+                    </p>
+                  </div>
+                );
+              })()}
             </div>
           </section>
         </div>

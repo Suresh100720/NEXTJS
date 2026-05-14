@@ -3,7 +3,7 @@
 import { useState, useMemo, useRef } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { AllCommunityModule, ModuleRegistry, RowSelectionOptions } from 'ag-grid-community';
-import { X, Calendar, Users, LogOut, Download, Trash2 } from 'lucide-react';
+import { X, Users, Download, Trash2 } from 'lucide-react';
 import StatCards from '@/components/dashboard/StatCards';
 import ApplicationsChart from '@/components/dashboard/ApplicationsChart';
 import Acquisitions from '@/components/dashboard/Acquisitions';
@@ -98,11 +98,7 @@ export default function DashboardClient({ stats, jobs, candidates }: { stats: an
     ];
   }, [stats, candidates]);
 
-  const reminders = [
-    { icon: <Calendar className="w-3 h-3 text-blue-500" />, text: "Interview schedule for today", time: "3:00 PM" },
-    { icon: <Users className="w-3 h-3 text-amber-500" />, text: `${stats.onHold || 0} candidates on hold`, time: "Check now" },
-    { icon: <LogOut className="w-3 h-3 text-red-500" />, text: `New rejections: ${stats.rejected || 0}`, time: "View list" },
-  ];
+
 
   const currentModalData = useMemo(() => {
     return statCardsData.find(c => c.id === activeModal);
@@ -159,7 +155,7 @@ export default function DashboardClient({ stats, jobs, candidates }: { stats: an
         </div>
       </div>
 
-      <DashboardSidebar stats={stats} recentJobs={stats.recentJobs || jobs.slice(0, 3)} reminders={reminders} />
+      <DashboardSidebar stats={stats} recentJobs={stats.recentJobs || jobs.slice(0, 3)} />
 
       {/* Modal */}
       {activeModal && currentModalData && (

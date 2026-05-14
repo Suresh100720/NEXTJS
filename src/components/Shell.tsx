@@ -35,20 +35,17 @@ export default function Shell({ children, modal }: { children: React.ReactNode, 
           isCollapsed ? 'w-20' : 'w-64'
         }`}
       >
-        {/* Toggle Button */}
-        <button 
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -right-3 top-20 bg-indigo-600 text-white rounded-full p-1 shadow-lg border-2 border-white z-50 hover:bg-indigo-500 transition-colors"
-        >
-          {isCollapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
-        </button>
-
-        {/* Logo */}
-        <div className={`h-20 flex items-center px-6 ${isCollapsed ? 'justify-center' : ''}`}>
-          <div className="text-2xl font-black bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent flex items-center gap-2">
-            R
-            {!isCollapsed && <span className="tracking-tighter">ECRUIT</span>}
+        {/* Header & Toggle */}
+        <div className={`h-20 flex items-center px-6 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+          <div className={`text-2xl font-black bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent flex items-center gap-2 ${isCollapsed ? 'hidden' : ''}`}>
+            R<span className="tracking-tighter">ECRUIT</span>
           </div>
+          <button 
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="text-slate-400 hover:text-white transition-colors p-1"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
         </div>
 
         {/* Navigation */}
@@ -74,13 +71,7 @@ export default function Shell({ children, modal }: { children: React.ReactNode, 
           })}
         </nav>
 
-        {/* Footer Actions */}
-        <div className="p-3 border-t border-slate-900 space-y-1">
-           <button className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-red-500 hover:bg-red-950/20 transition-all ${isCollapsed ? 'justify-center' : ''}`}>
-             <LogOut className="w-5 h-5" />
-             {!isCollapsed && <span className="text-sm font-bold">Logout</span>}
-           </button>
-        </div>
+
       </aside>
 
       {/* Main Content Area */}

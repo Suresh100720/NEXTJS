@@ -77,14 +77,27 @@ export default function CandidateModal({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100">
               <div className="text-slate-400 text-[10px] uppercase font-black tracking-widest mb-2">Email Address</div>
-              <div className="text-slate-700 font-bold text-sm truncate">{candidate.email}</div>
+              <div className="text-slate-700 font-bold text-sm truncate" title={candidate.email}>{candidate.email}</div>
+            </div>
+            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100">
+              <div className="text-slate-400 text-[10px] uppercase font-black tracking-widest mb-2">Experience</div>
+              <div className="text-slate-700 font-bold text-sm truncate">
+                {(() => {
+                  const currentYear = new Date().getFullYear();
+                  let expYears = 0;
+                  if (candidate.experience && candidate.experience !== 'Fresher') {
+                    expYears = parseInt(candidate.experience) || 0;
+                  }
+                  return expYears > 0 ? `${currentYear - expYears} to present` : 'Fresher';
+                })()}
+              </div>
             </div>
             <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100">
               <div className="text-slate-400 text-[10px] uppercase font-black tracking-widest mb-2">Skills Found</div>
-              <div className="text-slate-700 font-bold text-sm truncate">{candidate.skills?.length || 0} Technologies</div>
+              <div className="text-slate-700 font-bold text-sm truncate">{candidate.skills?.length || 0} Tech</div>
             </div>
           </div>
 
@@ -114,11 +127,17 @@ export default function CandidateModal({
           >
             Close
           </button>
+          <button
+            onClick={() => window.location.assign(`/candidates/${candidate._id || candidate.id}`)}
+            className="px-6 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold text-sm hover:bg-slate-50 hover:text-indigo-600 transition-all shadow-sm active:scale-95"
+          >
+            View Full Page
+          </button>
           <a 
             href={`https://mail.google.com/mail/?view=cm&fs=1&to=${candidate.email}&su=Regarding your application for ${candidate.role}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-8 py-2.5 bg-indigo-600 rounded-xl font-bold text-white hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-100 flex items-center justify-center no-underline active:scale-95"
+            className="px-8 py-2.5 bg-indigo-600 rounded-xl font-bold text-sm text-white hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-100 flex items-center justify-center no-underline active:scale-95"
           >
             Contact Candidate
           </a>

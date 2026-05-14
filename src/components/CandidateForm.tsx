@@ -8,8 +8,9 @@ import { X, ChevronDown, Check } from 'lucide-react';
 export default function CandidateForm({ onClose, initialRole, candidateToEdit }: { onClose: () => void, initialRole?: string, candidateToEdit?: any }) {
   const [name, setName] = useState(candidateToEdit?.name || '');
   const [email, setEmail] = useState(candidateToEdit?.email || '');
-  const [role, setRole] = useState(candidateToEdit?.role || initialRole || 'Frontend Developer');
-  const [status, setStatus] = useState(candidateToEdit?.status || 'Screening');
+  const [role, setRole] = useState(candidateToEdit?.role || initialRole || '');
+  const [status, setStatus] = useState(candidateToEdit?.status || '');
+  const [experience, setExperience] = useState(candidateToEdit?.experience || '');
   const [selectedSkills, setSelectedSkills] = useState<string[]>(candidateToEdit?.skills || []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -22,12 +23,13 @@ export default function CandidateForm({ onClose, initialRole, candidateToEdit }:
     const hasChanges = 
       name !== (candidateToEdit?.name || '') ||
       email !== (candidateToEdit?.email || '') ||
-      role !== (candidateToEdit?.role || initialRole || 'Frontend Developer') ||
-      status !== (candidateToEdit?.status || 'Screening') ||
+      role !== (candidateToEdit?.role || initialRole || '') ||
+      status !== (candidateToEdit?.status || '') ||
+      experience !== (candidateToEdit?.experience || '') ||
       JSON.stringify(selectedSkills) !== JSON.stringify(candidateToEdit?.skills || []);
     
     setIsDirty(hasChanges);
-  }, [name, email, role, status, selectedSkills, initialRole, candidateToEdit]);
+  }, [name, email, role, status, experience, selectedSkills, initialRole, candidateToEdit]);
 
   // Handle click outside to close skills dropdown
   useEffect(() => {
@@ -68,6 +70,8 @@ export default function CandidateForm({ onClose, initialRole, candidateToEdit }:
     'Screening'
   ];
 
+  const experienceOptions = ['Fresher', '1', '2', '3', '4', '5', '6', '7+'];
+
   const skillOptions = [
     'React', 'Next.js', 'Node.js', 'TypeScript', 'MongoDB', 
     'AWS', 'Tailwind CSS', 'Python', 'Java', 'Docker', 
@@ -87,7 +91,7 @@ export default function CandidateForm({ onClose, initialRole, candidateToEdit }:
     setLoading(true);
     setError('');
     try {
-      const data = { name, email, role, status, skills: selectedSkills };
+      const data = { name, email, role, status, experience, skills: selectedSkills };
       if (candidateToEdit) {
         await updateCandidate(candidateToEdit._id, data);
       } else {
@@ -155,30 +159,53 @@ export default function CandidateForm({ onClose, initialRole, candidateToEdit }:
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Applied Role</label>
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                disabled={!!initialRole}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-slate-900 font-medium transition-all disabled:opacity-50 appearance-none"
-              >
-                {roleOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-              </select>
+              <div className="relative">
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  disabled={!!initialRole}
+                  className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium transition-all disabled:opacity-50 appearance-none ${role ? 'text-slate-900' : 'text-slate-400'}`}
+                >
+                  <option value="" disabled hidden>Select role...</option>
+                  {roleOptions.map(opt => <option key={opt} value={opt} className="text-slate-900">{opt}</option>)}
+                </select>
+                <ChevronDown className="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Status</label>
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-slate-900 font-medium transition-all appearance-none"
-              >
-                {statusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-              </select>
+              <div className="relative">
+                <select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                  className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium transition-all appearance-none ${status ? 'text-slate-900' : 'text-slate-400'}`}
+                >
+                  <option value="" disabled hidden>Select status...</option>
+                  {statusOptions.map(opt => <option key={opt} value={opt} className="text-slate-900">{opt}</option>)}
+                </select>
+                <ChevronDown className="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
             </div>
           </div>
 
-          {/* Custom Multiselect for Skills */}
-          <div className="relative" ref={skillsRef}>
-            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Skills</label>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Experience (Years)</label>
+              <div className="relative">
+                <select
+                  value={experience}
+                  onChange={(e) => setExperience(e.target.value)}
+                  className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium transition-all appearance-none ${experience ? 'text-slate-900' : 'text-slate-400'}`}
+                >
+                  <option value="" disabled hidden>Select experience...</option>
+                  {experienceOptions.map(opt => <option key={opt} value={opt} className="text-slate-900">{opt}</option>)}
+                </select>
+                <ChevronDown className="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
+            </div>
+            {/* Custom Multiselect for Skills */}
+            <div className="relative" ref={skillsRef}>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Skills</label>
             <div 
               onClick={() => setIsSkillsOpen(!isSkillsOpen)}
               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 flex items-center justify-between cursor-pointer hover:border-slate-300 transition-all"
@@ -219,9 +246,10 @@ export default function CandidateForm({ onClose, initialRole, candidateToEdit }:
               </div>
             )}
           </div>
+        </div>
 
-          <div className="flex gap-3 pt-6 border-t border-slate-100">
-            <button
+        <div className="flex gap-3 pt-6 border-t border-slate-100">
+          <button
               type="button"
               onClick={handleCancel}
               className="flex-1 px-6 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition-colors border border-slate-200"

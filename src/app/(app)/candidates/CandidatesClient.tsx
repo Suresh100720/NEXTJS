@@ -6,8 +6,8 @@ import CandidateForm from '@/components/CandidateForm';
 import { AgGridReact } from 'ag-grid-react';
 import { AllCommunityModule, ModuleRegistry, RowSelectionOptions } from 'ag-grid-community';
 import { deleteCandidate, deleteCandidates } from '@/lib/api';
-import { useRouter } from 'next/navigation';
-import { Download, Trash2, Edit2, User, MoreHorizontal, X } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Download, Trash2, Edit2, User, MoreHorizontal, X, Search, ArrowRight } from 'lucide-react';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -19,6 +19,45 @@ export default function CandidatesClient({ initialCandidates }: { initialCandida
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
   const gridRef = useRef<any>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentStatus = searchParams.get('status') || 'All';
+  const currentSearch = searchParams.get('search') || '';
+  const [searchInput, setSearchInput] = useState(currentSearch);
+
+  const handleSearch = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (searchInput) {
+      params.set('search', searchInput);
+    } else {
+      params.delete('search');
+    }
+    router.push(`/candidates?${params.toString()}`);
+  };
+
+  const handleClearSearch = () => {
+    setSearchInput('');
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('search');
+    router.push(`/candidates?${params.toString()}`);
+  };
+
+  const handleFilter = (status: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (status === currentStatus || status === 'All') {
+      params.delete('status');
+    } else {
+      params.set('status', status);
+    }
+    router.push(`/candidates?${params.toString()}`);
+  };
+
+  const clearFilter = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('status');
+    router.push(`/candidates?${params.toString()}`);
+  };
+
+  const filterOptions = ['Screening', 'Shortlisted', 'On Hold', 'Rejected', 'Finalised'];
 
   const getStatusStyle = (status: string) => {
     switch (status) {
@@ -71,12 +110,6 @@ export default function CandidatesClient({ initialCandidates }: { initialCandida
     gridRef.current?.api.exportDataAsCsv();
   };
 
-  const getAvatarColor = (name: string) => {
-    const colors = ['bg-[#319795]', 'bg-[#38A169]', 'bg-[#E53E3E]', 'bg-[#D69E2E]', 'bg-[#805AD5]', 'bg-[#3182CE]'];
-    const index = name?.length % colors.length || 0;
-    return colors[index];
-  };
-
   // Column Definitions
   const columnDefs = useMemo(() => [
     {
@@ -84,16 +117,23 @@ export default function CandidatesClient({ initialCandidates }: { initialCandida
       headerName: 'Name',
       flex: 1,
       cellRenderer: (params: any) => (
-        <div className="flex items-center gap-3 h-full">
-          <div className={`w-7 h-7 rounded-full ${getAvatarColor(params.value)} flex items-center justify-center text-white text-[10px] font-bold`}>
-            {params.value?.charAt(0)}
-          </div>
+        <div className="flex items-center h-full">
           <span className="font-bold text-slate-700">{params.value}</span>
         </div>
       )
     },
     { field: 'email', headerName: 'Email', flex: 1.2 },
     { field: 'role', headerName: 'Applied Role', flex: 1 },
+    {
+      field: 'experience',
+      headerName: 'Experience',
+      width: 110,
+      cellRenderer: (params: any) => (
+        <span className="text-slate-600 font-medium">
+          {params.value === 'Fresher' ? 'Fresher' : `${params.value || 'Fresher'} Yrs`}
+        </span>
+      )
+    },
     {
       field: 'status',
       headerName: 'Status',
@@ -139,6 +179,7 @@ export default function CandidatesClient({ initialCandidates }: { initialCandida
     {
       headerName: 'Profile',
       width: 80,
+      pinned: 'right',
       cellRenderer: (params: any) => (
         <Link href={`/candidates/${params.data._id}`} className="flex items-center justify-center h-full text-slate-400 hover:text-indigo-600 transition-colors">
           <User className="w-4 h-4" />
@@ -147,7 +188,7 @@ export default function CandidatesClient({ initialCandidates }: { initialCandida
     },
     {
       headerName: 'Actions',
-      width: 80,
+      width: 90,
       cellRenderer: (params: any) => (
         <div className="flex items-center justify-center h-full">
           <button
@@ -204,27 +245,70 @@ export default function CandidatesClient({ initialCandidates }: { initialCandida
 
   return (
     <div className="space-y-6 relative">
-      <div className="flex justify-end items-center">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white p-4 rounded-3xl border border-slate-200 shadow-sm">
+
+        {/* Left Side: Filters */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 xl:pb-0 hide-scrollbar" style={{ scrollbarWidth: 'none' }}>
+          {filterOptions.map(opt => (
+            <button
+              key={opt}
+              onClick={() => handleFilter(opt)}
+              className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${currentStatus === opt
+                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100'
+                : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+                }`}
+            >
+              {opt}
+            </button>
+          ))}
+          {currentStatus !== 'All' && (
+            <button
+              onClick={clearFilter}
+              className="px-3 py-2 rounded-xl text-sm font-bold whitespace-nowrap text-red-500 hover:bg-red-50 transition-all flex items-center gap-1 ml-1"
+            >
+              <X className="w-3.5 h-3.5" /> Clear
+            </button>
+          )}
+        </div>
+
+        {/* Right Side: Search and Actions */}
         <div className="flex items-center gap-3">
+          <div className="flex items-center bg-slate-50 border border-slate-200 rounded-xl p-1 shadow-sm">
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                className="pl-9 pr-2 py-1.5 bg-transparent text-sm font-bold text-slate-700 focus:outline-none w-32 lg:w-40 transition-all"
+              />
+            </div>
+            {(!currentSearch || searchInput !== currentSearch) ? (
+              <button onClick={handleSearch} className="p-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-all shadow-sm" title="Search">
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            ) : (
+              <button onClick={handleClearSearch} className="p-1.5 bg-slate-200 text-slate-500 rounded-lg hover:bg-slate-300 transition-all shadow-sm" title="Cancel Search">
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
           {selectedRows.length > 0 && (
             <>
-              <button
-                onClick={exportCsv}
-                className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm"
-              >
-                <Download className="w-4 h-4" /> Export CSV
+              <button onClick={exportCsv} className="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 transition-all shadow-sm" title="Export CSV">
+                <Download className="w-4 h-4" />
               </button>
-              <button
-                onClick={handleBulkDelete}
-                className="flex items-center gap-2 px-4 py-2 bg-red-50 border border-red-100 rounded-xl text-sm font-bold text-red-600 hover:bg-red-100 transition-all shadow-sm"
-              >
-                <Trash2 className="w-4 h-4" /> Delete ({selectedRows.length})
+              <button onClick={handleBulkDelete} className="p-2.5 bg-red-50 border border-red-100 rounded-xl text-red-600 hover:bg-red-100 transition-all shadow-sm" title={`Delete ${selectedRows.length} rows`}>
+                <Trash2 className="w-4 h-4" />
               </button>
             </>
           )}
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-6 py-2.5 bg-indigo-600 rounded-xl font-bold text-white hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-100 active:scale-95"
+            className="px-6 py-2.5 bg-indigo-600 rounded-xl font-bold text-white hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-100 active:scale-95 whitespace-nowrap"
           >
             Add Candidate
           </button>

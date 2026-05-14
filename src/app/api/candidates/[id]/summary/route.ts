@@ -15,10 +15,11 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
       const prompt = `Generate a professional, concise 2-sentence summary for the following candidate:
       Name: ${candidate.name}
       Role: ${candidate.role}
-      Skills: ${candidate.skills.join(', ')}
+      Experience: ${candidate.experience ? (candidate.experience === 'Fresher' ? 'Fresher/Recent Graduate' : `${candidate.experience} years`) : 'Not specified'}
+      Skills: ${candidate.skills?.join(', ') || 'None listed'}
       Status: ${candidate.status}
       
-      The summary should highlight their experience and suitability for the role.`;
+      The summary should explicitly mention their years of experience and highlight their suitability for the role based on their skills.`;
 
       const chatCompletion = await groq.chat.completions.create({
         messages: [
@@ -30,7 +31,9 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 
       return NextResponse.json({ summary: chatCompletion.choices[0]?.message?.content || 'Summary not available.' });
     } else {
-      return NextResponse.json({ summary: `Professional ${candidate.role} with skills in ${candidate.skills.slice(0, 3).join(', ')}. Currently in ${candidate.status} stage.` });
+      const expText = candidate.experience ? (candidate.experience === 'Fresher' ? 'Entry-level' : `${candidate.experience}-year experienced`) : 'Professional';
+      const skillsText = candidate.skills && candidate.skills.length > 0 ? `with skills in ${candidate.skills.slice(0, 3).join(', ')}` : 'ready for new opportunities';
+      return NextResponse.json({ summary: `${expText} ${candidate.role} ${skillsText}. Currently in the ${candidate.status} stage.` });
     }
   } catch (error) {
     console.error('Groq Error:', error);

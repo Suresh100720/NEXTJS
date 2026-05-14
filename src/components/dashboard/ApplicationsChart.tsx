@@ -21,16 +21,18 @@ export default function ApplicationsChart({ data }: { data: any[] }) {
           <option>Month</option>
         </select>
       </div>
-      <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data}>
-            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94A3B8', fontSize: 11 }} />
-            <Tooltip cursor={{ fill: '#F8FAFC' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-            <Bar dataKey="apps" fill="#6366F1" radius={[4, 4, 0, 0]} barSize={8} />
-            <Bar dataKey="short" fill="#FFB800" radius={[4, 4, 0, 0]} barSize={8} />
-            <Bar dataKey="rej" fill="#FF4B4B" radius={[4, 4, 0, 0]} barSize={8} />
-          </BarChart>
-        </ResponsiveContainer>
+      <div className="h-[280px] flex flex-col pb-2">
+        <div className="flex-1 min-h-0">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data}>
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94A3B8', fontSize: 11 }} />
+              <Tooltip cursor={{ fill: '#F8FAFC' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+              <Bar dataKey="apps" fill="#6366F1" radius={[4, 4, 0, 0]} barSize={8} />
+              <Bar dataKey="short" fill="#FFB800" radius={[4, 4, 0, 0]} barSize={8} />
+              <Bar dataKey="rej" fill="#FF4B4B" radius={[4, 4, 0, 0]} barSize={8} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
         <Legend />
       </div>
     </div>

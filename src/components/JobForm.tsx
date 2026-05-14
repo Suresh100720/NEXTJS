@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createJob, updateJob } from '@/lib/api';
+import { ChevronDown } from 'lucide-react';
 
 export default function JobForm({ onClose, jobToEdit }: { onClose: () => void, jobToEdit?: any }) {
-  const [title, setTitle] = useState(jobToEdit?.title || 'Frontend Developer');
-  const [department, setDepartment] = useState(jobToEdit?.department || 'Engineering');
-  const [type, setType] = useState(jobToEdit?.type || 'Full-time');
-  const [status, setStatus] = useState(jobToEdit?.status || 'Active');
+  const [title, setTitle] = useState(jobToEdit?.title || '');
+  const [department, setDepartment] = useState(jobToEdit?.department || '');
+  const [type, setType] = useState(jobToEdit?.type || '');
+  const [experience, setExperience] = useState(jobToEdit?.experience || '');
+  const [status, setStatus] = useState(jobToEdit?.status || '');
   const [loading, setLoading] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const router = useRouter();
@@ -40,16 +42,19 @@ export default function JobForm({ onClose, jobToEdit }: { onClose: () => void, j
     'Urgently Hiring'
   ];
 
+  const experienceOptions = ['Fresher', '1', '2', '3', '4', '5', '6', '7+'];
+
   useEffect(() => {
-    if (title !== (jobToEdit?.title || 'Frontend Developer') || 
-        department !== (jobToEdit?.department || 'Engineering') || 
-        type !== (jobToEdit?.type || 'Full-time') ||
-        status !== (jobToEdit?.status || 'Active')) {
+    if (title !== (jobToEdit?.title || '') || 
+        department !== (jobToEdit?.department || '') || 
+        type !== (jobToEdit?.type || '') ||
+        experience !== (jobToEdit?.experience || '') ||
+        status !== (jobToEdit?.status || '')) {
       setIsDirty(true);
     } else {
       setIsDirty(false);
     }
-  }, [title, department, type, status, jobToEdit]);
+  }, [title, department, type, experience, status, jobToEdit]);
 
   const handleCancel = () => {
     if (isDirty) {
@@ -65,7 +70,7 @@ export default function JobForm({ onClose, jobToEdit }: { onClose: () => void, j
     e.preventDefault();
     setLoading(true);
     try {
-      const jobData = { title, department, type, status };
+      const jobData = { title, department, type, status, experience };
       if (jobToEdit) {
         await updateJob(jobToEdit._id || jobToEdit.id, jobData);
       } else {
@@ -96,46 +101,76 @@ export default function JobForm({ onClose, jobToEdit }: { onClose: () => void, j
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-500 mb-1">Role / Title</label>
-            <select
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900"
-            >
-              {roleOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-            </select>
+            <div className="relative">
+              <select
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none ${title ? 'text-slate-900' : 'text-slate-400'}`}
+              >
+                <option value="" disabled hidden>Select job title...</option>
+                {roleOptions.map(opt => <option key={opt} value={opt} className="text-slate-900">{opt}</option>)}
+              </select>
+              <ChevronDown className="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-500 mb-1">Department</label>
-            <select
-              value={department}
-              onChange={(e) => setDepartment(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900"
-            >
-              {deptOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-            </select>
+            <div className="relative">
+              <select
+                value={department}
+                onChange={(e) => setDepartment(e.target.value)}
+                className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none ${department ? 'text-slate-900' : 'text-slate-400'}`}
+              >
+                <option value="" disabled hidden>Select department...</option>
+                {deptOptions.map(opt => <option key={opt} value={opt} className="text-slate-900">{opt}</option>)}
+              </select>
+              <ChevronDown className="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-500 mb-1">Status</label>
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900"
-            >
-              {statusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-            </select>
+            <div className="relative">
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none ${status ? 'text-slate-900' : 'text-slate-400'}`}
+              >
+                <option value="" disabled hidden>Select status...</option>
+                {statusOptions.map(opt => <option key={opt} value={opt} className="text-slate-900">{opt}</option>)}
+              </select>
+              <ChevronDown className="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-500 mb-1">Employment Type</label>
-            <select
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900"
-            >
-              <option>Full-time</option>
-              <option>Contract</option>
-              <option>Part-time</option>
-              <option>Freelance</option>
-            </select>
+            <div className="relative">
+              <select
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+                className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none ${type ? 'text-slate-900' : 'text-slate-400'}`}
+              >
+                <option value="" disabled hidden>Select type...</option>
+                <option value="Full-time" className="text-slate-900">Full-time</option>
+                <option value="Contract" className="text-slate-900">Contract</option>
+                <option value="Part-time" className="text-slate-900">Part-time</option>
+                <option value="Freelance" className="text-slate-900">Freelance</option>
+              </select>
+              <ChevronDown className="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-500 mb-1">Experience (Years)</label>
+            <div className="relative">
+              <select
+                value={experience}
+                onChange={(e) => setExperience(e.target.value)}
+                className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none ${experience ? 'text-slate-900' : 'text-slate-400'}`}
+              >
+                <option value="" disabled hidden>Select experience...</option>
+                {experienceOptions.map(opt => <option key={opt} value={opt} className="text-slate-900">{opt}</option>)}
+              </select>
+              <ChevronDown className="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
           </div>
           <div className="flex gap-3 pt-4">
             <button

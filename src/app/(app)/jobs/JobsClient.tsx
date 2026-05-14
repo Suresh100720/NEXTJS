@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import JobForm from '@/app/components/JobForm';
-import CandidateForm from '@/app/components/CandidateForm';
-import { deleteJob } from '@/app/lib/api';
+import JobForm from '@/components/JobForm';
+import CandidateForm from '@/components/CandidateForm';
+import { deleteJob } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 
 export default function JobsClient({ initialJobs }: { initialJobs: any[] }) {
@@ -88,6 +88,9 @@ export default function JobsClient({ initialJobs }: { initialJobs: any[] }) {
                   </div>
                   <div className="flex items-center gap-2.5 text-slate-400 text-sm font-medium">
                     <span className="opacity-40">📍</span> {job.type || 'Full-time'}
+                  </div>
+                  <div className="flex items-center gap-2.5 text-slate-400 text-sm font-medium">
+                    <span className="opacity-40">⏳</span> Experience: {job.experience || 'Fresher'}
                   </div>
                 </div>
 
