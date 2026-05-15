@@ -5,7 +5,8 @@ import Link from 'next/link';
 import CandidateForm from '@/components/CandidateForm';
 import { AgGridReact } from 'ag-grid-react';
 import { AllCommunityModule, ModuleRegistry, RowSelectionOptions } from 'ag-grid-community';
-import { deleteCandidate, deleteCandidates } from '@/lib/api';
+import { deleteCandidateAction } from '@/lib/actions';
+import { deleteCandidates } from '@/lib/api';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Download, Trash2, Edit2, User, MoreHorizontal, X, Search, ArrowRight } from 'lucide-react';
 
@@ -60,12 +61,13 @@ export default function CandidatesClient({ initialCandidates }: { initialCandida
   const filterOptions = ['Screening', 'Shortlisted', 'On Hold', 'Rejected', 'Finalised'];
 
   const getStatusStyle = (status: string) => {
-    switch (status) {
-      case 'Shortlisted': return 'text-indigo-600 ';
-      case 'Screening': return 'text-blue-600 ';
-      case 'Finalised': return 'text-emerald-600 ';
-      case 'On Hold': return 'text-orange-600 ';
-      case 'Rejected': return 'text-red-600 ';
+    const s = status?.toLowerCase() || '';
+    switch (s) {
+      case 'shortlisted': return 'text-indigo-600 ';
+      case 'screening': return 'text-blue-600 ';
+      case 'finalised': return 'text-emerald-600 ';
+      case 'on hold': return 'text-orange-600 ';
+      case 'rejected': return 'text-red-600 ';
       default: return 'text-slate-600 ';
     }
   };
@@ -91,7 +93,7 @@ export default function CandidatesClient({ initialCandidates }: { initialCandida
   const handleDelete = async (id: string, name: string) => {
     if (confirm(`Delete candidate "${name}"?`)) {
       try {
-        await deleteCandidate(id);
+        await deleteCandidateAction(id);
         router.refresh();
         setActionMenuData(null);
       } catch (err) {

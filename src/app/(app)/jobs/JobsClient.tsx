@@ -95,8 +95,8 @@ export default function JobsClient({ initialJobs }: { initialJobs: any[] }) {
                 </div>
 
                 {/* Openings */}
-                <div className="text-xs font-bold text-slate-900 mb-8">
-                  1 Openings
+                <div className="text-xs font-bold text-indigo-600 mb-8 bg-indigo-50 inline-block px-3 py-1 rounded-full">
+                  {job.openings || 1} {job.openings === 1 ? 'Opening' : 'Openings'}
                 </div>
               </div>
 

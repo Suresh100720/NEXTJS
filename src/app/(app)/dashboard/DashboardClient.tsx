@@ -72,12 +72,12 @@ export default function DashboardClient({ stats, jobs, candidates }: { stats: an
     return last7Days;
   }, [stats.weeklyStats, candidates]);
 
-  const statCardsData = [
+  const statCardsData = useMemo(() => [
     { id: 'total', label: 'Total Applications', value: stats.totalCandidates || 0, data: candidates, color: 'text-blue-500' },
     { id: 'onhold', label: 'On Hold Candidates', value: stats.onHold || 0, data: candidates.filter(c => c.status === 'On Hold'), color: 'text-orange-500' },
     { id: 'shortlisted', label: 'Shortlisted Candidates', value: stats.shortlisted || 0, data: candidates.filter(c => c.status === 'Shortlisted'), color: 'text-indigo-500' },
     { id: 'rejected', label: 'Rejected Candidates', value: stats.rejected || 0, data: candidates.filter(c => c.status === 'Rejected'), color: 'text-red-500' },
-  ];
+  ], [stats, candidates]);
 
   const acquisitionsData = useMemo(() => {
     const total = stats.totalCandidates || candidates.length || 0;
@@ -103,6 +103,8 @@ export default function DashboardClient({ stats, jobs, candidates }: { stats: an
   const currentModalData = useMemo(() => {
     return statCardsData.find(c => c.id === activeModal);
   }, [activeModal, statCardsData]);
+
+  const getRowId = useMemo(() => (params: any) => params.data._id || params.data.id, []);
 
   const modalColumnDefs = useMemo(() => [
     { field: 'name', headerName: 'Name', flex: 1, cellClass: 'font-bold text-slate-700' },
@@ -196,6 +198,7 @@ export default function DashboardClient({ stats, jobs, candidates }: { stats: an
                   paginationPageSizeSelector={[10, 20, 50]}
                   rowSelection={rowSelection}
                   onSelectionChanged={onSelectionChanged}
+                  getRowId={getRowId}
                 />
               </div>
             </div>

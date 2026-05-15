@@ -3,14 +3,21 @@ import Link from 'next/link';
 
 export default async function SearchResultsPage({
   params,
+  searchParams,
 }: {
   params: { query: string };
+  searchParams: { role?: string, experience?: string, status?: string, q?: string };
 }) {
   const query = decodeURIComponent(params.query);
   let results = { jobs: [], candidates: [] };
 
   try {
-    results = await searchData(query);
+    results = await searchData(
+      searchParams.q || (query === 'results' ? '' : query), 
+      searchParams.role, 
+      searchParams.experience, 
+      searchParams.status
+    );
   } catch (error) {
     console.error('Search failed:', error);
   }

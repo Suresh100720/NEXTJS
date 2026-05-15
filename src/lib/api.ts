@@ -90,8 +90,14 @@ export async function getStats() {
   return res.json();
 }
 
-export async function searchData(q: string) {
-  const res = await fetch(`${BASE_URL}/search?q=${encodeURIComponent(q)}`, { cache: 'no-store' });
+export async function searchData(q: string, role?: string, experience?: string, status?: string) {
+  const params = new URLSearchParams();
+  if (q && q !== 'results') params.set('q', q);
+  if (role) params.set('role', role);
+  if (experience) params.set('experience', experience);
+  if (status) params.set('status', status);
+  
+  const res = await fetch(`${BASE_URL}/search?${params.toString()}`, { cache: 'no-store' });
   if (!res.ok) throw new Error('Failed to search');
   return res.json();
 }

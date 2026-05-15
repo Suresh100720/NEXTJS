@@ -37,8 +37,8 @@ export default function Shell({ children, modal }: { children: React.ReactNode, 
       >
         {/* Header & Toggle */}
         <div className={`h-20 flex items-center px-6 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
-          <div className={`text-2xl font-black bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent flex items-center gap-2 ${isCollapsed ? 'hidden' : ''}`}>
-            R<span className="tracking-tighter">ECRUIT</span>
+          <div className={`text-2xl font-black bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent whitespace-nowrap ${isCollapsed ? 'hidden' : ''}`}>
+            RECRUIT
           </div>
           <button 
             onClick={() => setIsCollapsed(!isCollapsed)}

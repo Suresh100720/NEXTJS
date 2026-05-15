@@ -5,6 +5,7 @@ export interface IJob extends Document {
   department: string;
   type: string;
   experience?: string;
+  openings: number;
   status: 'Active' | 'Closed' | 'Hiring' | 'Urgently Hiring';
   createdAt: Date;
 }
@@ -14,6 +15,7 @@ const JobSchema: Schema = new Schema({
   department: { type: String, required: true },
   type: { type: String, required: true },
   experience: { type: String },
+  openings: { type: Number, default: 1 },
   status: { type: String, enum: ['Active', 'Closed', 'Hiring', 'Urgently Hiring'], default: 'Active' },
 }, { timestamps: true });
 

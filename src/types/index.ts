@@ -9,9 +9,12 @@ export interface Candidate {
 
 export interface Job {
   id: string;
+  _id?: string;
   title: string;
   department: string;
-  type: 'full-time' | 'part-time' | 'contract';
-  salary: string;
-  location: string;
+  type: string;
+  experience?: string;
+  openings: number;
+  status: 'Active' | 'Closed' | 'Hiring' | 'Urgently Hiring';
+  createdAt?: string;
 }
