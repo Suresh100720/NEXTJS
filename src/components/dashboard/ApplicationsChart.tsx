@@ -18,7 +18,7 @@ export default function ApplicationsChart({ data }: { data: any[] }) {
       <div className="flex justify-between items-center mb-8">
         <h3 className="font-bold text-slate-800">Statistics of Active Applications</h3>
         <select className="text-xs font-bold bg-slate-50 px-3 py-1.5 rounded-lg border-none text-slate-500">
-          <option>Month</option>
+          <option>Week</option>
         </select>
       </div>
       <div className="h-[280px] flex flex-col pb-2">
