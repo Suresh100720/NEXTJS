@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef, useOptimistic } from 'react';
 import Link from 'next/link';
 import CandidateForm from '@/components/CandidateForm';
 import { AgGridReact } from 'ag-grid-react';
@@ -8,7 +8,7 @@ import { AllCommunityModule, ModuleRegistry, RowSelectionOptions } from 'ag-grid
 import { deleteCandidateAction } from '@/lib/actions';
 import { deleteCandidates } from '@/lib/api';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Download, Trash2, Edit2, User, MoreHorizontal, X, Search, ArrowRight } from 'lucide-react';
+import { Download, Trash2, Edit2, User, MoreHorizontal, X, Search, ArrowRight, AlertCircle } from 'lucide-react';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -18,6 +18,7 @@ export default function CandidatesClient({ initialCandidates }: { initialCandida
   const [popoverData, setPopoverData] = useState<{ name: string, skills: string[], x: number, y: number } | null>(null);
   const [actionMenuData, setActionMenuData] = useState<{ candidate: any, x: number, y: number } | null>(null);
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id?: string, name?: string, ids?: string[], type: 'single' | 'bulk' } | null>(null);
   const gridRef = useRef<any>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -77,28 +78,38 @@ export default function CandidatesClient({ initialCandidates }: { initialCandida
     setSelectedRows(selected || []);
   };
 
-  const handleBulkDelete = async () => {
-    const ids = selectedRows.map(r => r._id);
-    if (confirm(`Are you sure you want to delete ${ids.length} candidates?`)) {
-      try {
-        await deleteCandidates(ids);
-        router.refresh();
-        setSelectedRows([]);
-      } catch (err) {
-        console.error(err);
-      }
-    }
+  const handleDelete = (id: string, name: string) => {
+    setDeleteConfirm({ id, name, type: 'single' });
+    setActionMenuData(null);
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (confirm(`Delete candidate "${name}"?`)) {
-      try {
-        await deleteCandidateAction(id);
-        router.refresh();
-        setActionMenuData(null);
-      } catch (err) {
-        console.error(err);
+  const [optimisticCandidates, addOptimisticCandidate] = useOptimistic(
+    initialCandidates,
+    (state, { action, id }) => {
+      if (action === 'delete') {
+        return state.filter(c => c._id !== id);
       }
+      return state;
+    }
+  );
+
+  const confirmDelete = async () => {
+    if (!deleteConfirm) return;
+
+    try {
+      if (deleteConfirm.type === 'single' && deleteConfirm.id) {
+        addOptimisticCandidate({ action: 'delete', id: deleteConfirm.id });
+        await deleteCandidateAction(deleteConfirm.id);
+      } else if (deleteConfirm.type === 'bulk' && deleteConfirm.ids) {
+        deleteConfirm.ids.forEach(id => addOptimisticCandidate({ action: 'delete', id }));
+        await deleteCandidates(deleteConfirm.ids);
+        setSelectedRows([]);
+      }
+      router.refresh();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setDeleteConfirm(null);
     }
   };
 
@@ -152,6 +163,7 @@ export default function CandidatesClient({ initialCandidates }: { initialCandida
       field: 'skills',
       headerName: 'Skills',
       flex: 1.2,
+      valueFormatter: (params: any) => (params.value || []).join(', '),
       cellRenderer: (params: any) => {
         const skills = params.value || [];
         if (skills.length === 0) return <span className="text-slate-400 italic text-sm">None</span>;
@@ -303,7 +315,7 @@ export default function CandidatesClient({ initialCandidates }: { initialCandida
               <button onClick={exportCsv} className="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 transition-all shadow-sm" title="Export CSV">
                 <Download className="w-4 h-4" />
               </button>
-              <button onClick={handleBulkDelete} className="p-2.5 bg-red-50 border border-red-100 rounded-xl text-red-600 hover:bg-red-100 transition-all shadow-sm" title={`Delete ${selectedRows.length} rows`}>
+              <button onClick={() => setDeleteConfirm({ ids: selectedRows.map(r => r._id), type: 'bulk' })} className="p-2.5 bg-red-50 border border-red-100 rounded-xl text-red-600 hover:bg-red-100 transition-all shadow-sm" title={`Delete ${selectedRows.length} rows`}>
                 <Trash2 className="w-4 h-4" />
               </button>
             </>
@@ -321,7 +333,7 @@ export default function CandidatesClient({ initialCandidates }: { initialCandida
         <div className="ag-theme-alpine w-full">
           <AgGridReact
             ref={gridRef}
-            rowData={initialCandidates}
+            rowData={optimisticCandidates}
             columnDefs={columnDefs as any}
             defaultColDef={defaultColDef}
             domLayout='autoHeight'
@@ -383,6 +395,44 @@ export default function CandidatesClient({ initialCandidates }: { initialCandida
             </button>
           </div>
           <div className="absolute -top-2 right-4 w-4 h-4 bg-white border-l border-t border-slate-200 rotate-45"></div>
+        </div>
+      )}
+      
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="w-full max-w-[400px] bg-white rounded-3xl p-8 shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex items-start gap-4 mb-6">
+              <div className="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center shrink-0">
+                <AlertCircle className="w-6 h-6 text-red-500" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">
+                  {deleteConfirm.type === 'single' ? 'Delete Candidate?' : 'Delete Candidates?'}
+                </h3>
+                <p className="text-slate-500 text-sm leading-relaxed">
+                  {deleteConfirm.type === 'single' 
+                    ? `Are you sure you want to delete "${deleteConfirm.name}"? This action cannot be undone.`
+                    : `Are you sure you want to delete ${deleteConfirm.ids?.length} candidates? This action cannot be undone.`
+                  }
+                </p>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                className="px-6 py-2.5 border border-slate-200 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-6 py-2.5 bg-red-600 text-white rounded-xl font-bold text-sm hover:bg-red-700 transition-all shadow-lg shadow-red-100"
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

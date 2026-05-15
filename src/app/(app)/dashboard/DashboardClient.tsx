@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useOptimistic } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { AllCommunityModule, ModuleRegistry, RowSelectionOptions } from 'ag-grid-community';
-import { X, Users, Download, Trash2 } from 'lucide-react';
+import { X, Users, Download, Trash2, AlertCircle } from 'lucide-react';
 import StatCards from '@/components/dashboard/StatCards';
 import ApplicationsChart from '@/components/dashboard/ApplicationsChart';
 import Acquisitions from '@/components/dashboard/Acquisitions';
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
-import { deleteCandidate } from '@/lib/api';
+import { deleteCandidateAction } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -16,8 +16,40 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 export default function DashboardClient({ stats, jobs, candidates }: { stats: any, jobs: any[], candidates: any[] }) {
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [selectedModalRows, setSelectedModalRows] = useState<any[]>([]);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string, name: string } | null>(null);
   const modalGridRef = useRef<any>(null);
   const router = useRouter();
+
+  const [optimisticCandidates, addOptimisticCandidate] = useOptimistic(
+    candidates,
+    (state, { action, id }) => {
+      if (action === 'delete') {
+        return state.filter(c => (c._id || c.id) !== id);
+      }
+      return state;
+    }
+  );
+
+  const handleDelete = (id: string, name: string) => {
+    setDeleteConfirm({ id, name });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteConfirm) return;
+    try {
+      addOptimisticCandidate({ action: 'delete', id: deleteConfirm.id });
+      await deleteCandidateAction(deleteConfirm.id);
+      router.refresh();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setDeleteConfirm(null);
+    }
+  };
+
+  const exportCsv = () => {
+    modalGridRef.current?.api.exportDataAsCsv();
+  };
 
   const getStatusStyle = (status: string) => {
     switch (status) {
@@ -28,22 +60,6 @@ export default function DashboardClient({ stats, jobs, candidates }: { stats: an
       case 'Rejected': return 'text-red-600 ';
       default: return 'text-slate-600 ';
     }
-  };
-
-  const handleDelete = async (id: string, name: string) => {
-    if (confirm(`Delete candidate "${name}"?`)) {
-      try {
-        await deleteCandidate(id);
-        router.refresh();
-        setActiveModal(null);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-  };
-
-  const exportCsv = () => {
-    modalGridRef.current?.api.exportDataAsCsv();
   };
 
   const onSelectionChanged = () => {
@@ -61,7 +77,7 @@ export default function DashboardClient({ stats, jobs, candidates }: { stats: an
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
-      const dayCandidates = candidates.filter(c => new Date(c.createdAt).toDateString() === d.toDateString());
+      const dayCandidates = optimisticCandidates.filter(c => new Date(c.createdAt).toDateString() === d.toDateString());
       last7Days.push({
         name: days[d.getDay()],
         apps: dayCandidates.length,
@@ -70,24 +86,24 @@ export default function DashboardClient({ stats, jobs, candidates }: { stats: an
       });
     }
     return last7Days;
-  }, [stats.weeklyStats, candidates]);
+  }, [stats.weeklyStats, optimisticCandidates]);
 
   const statCardsData = useMemo(() => [
-    { id: 'total', label: 'Total Applications', value: stats.totalCandidates || 0, data: candidates, color: 'text-blue-500' },
-    { id: 'onhold', label: 'On Hold Candidates', value: stats.onHold || 0, data: candidates.filter(c => c.status === 'On Hold'), color: 'text-orange-500' },
-    { id: 'shortlisted', label: 'Shortlisted Candidates', value: stats.shortlisted || 0, data: candidates.filter(c => c.status === 'Shortlisted'), color: 'text-indigo-500' },
-    { id: 'rejected', label: 'Rejected Candidates', value: stats.rejected || 0, data: candidates.filter(c => c.status === 'Rejected'), color: 'text-red-500' },
-  ], [stats, candidates]);
+    { id: 'total', label: 'Total Applications', value: stats.totalCandidates || 0, data: optimisticCandidates, color: 'text-blue-500' },
+    { id: 'onhold', label: 'On Hold Candidates', value: stats.onHold || 0, data: optimisticCandidates.filter(c => c.status === 'On Hold'), color: 'text-orange-500' },
+    { id: 'shortlisted', label: 'Shortlisted Candidates', value: stats.shortlisted || 0, data: optimisticCandidates.filter(c => c.status === 'Shortlisted'), color: 'text-indigo-500' },
+    { id: 'rejected', label: 'Rejected Candidates', value: stats.rejected || 0, data: optimisticCandidates.filter(c => c.status === 'Rejected'), color: 'text-red-500' },
+  ], [stats, optimisticCandidates]);
 
   const acquisitionsData = useMemo(() => {
-    const total = stats.totalCandidates || candidates.length || 0;
+    const total = stats.totalCandidates || optimisticCandidates.length || 0;
     const getPercent = (count: number) => total ? Math.round((count / total) * 100) : 0;
     const data = stats.acquisitions || {
       applications: 100,
-      shortlisted: getPercent(stats.shortlisted || candidates.filter(c => c.status === 'Shortlisted').length),
-      rejected: getPercent(stats.rejected || candidates.filter(c => c.status === 'Rejected').length),
-      onHold: getPercent(stats.onHold || candidates.filter(c => c.status === 'On Hold').length),
-      finalised: getPercent(stats.finalised || candidates.filter(c => c.status === 'Finalised').length),
+      shortlisted: getPercent(stats.shortlisted || optimisticCandidates.filter(c => c.status === 'Shortlisted').length),
+      rejected: getPercent(stats.rejected || optimisticCandidates.filter(c => c.status === 'Rejected').length),
+      onHold: getPercent(stats.onHold || optimisticCandidates.filter(c => c.status === 'On Hold').length),
+      finalised: getPercent(stats.finalised || optimisticCandidates.filter(c => c.status === 'Finalised').length),
     };
     return [
       { label: 'Applications', val: data.applications, color: 'bg-blue-500' },
@@ -209,6 +225,39 @@ export default function DashboardClient({ stats, jobs, candidates }: { stats: an
                 className="px-10 py-3 bg-slate-900 text-white rounded-2xl font-bold transition-all hover:bg-slate-800 active:scale-95 shadow-lg shadow-slate-200"
               >
                 Close View
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="w-full max-w-[400px] bg-white rounded-3xl p-8 shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex items-start gap-4 mb-6">
+              <div className="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center shrink-0">
+                <AlertCircle className="w-6 h-6 text-red-500" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Delete Candidate?</h3>
+                <p className="text-slate-500 text-sm leading-relaxed">
+                  Are you sure you want to delete "{deleteConfirm.name}"? This action cannot be undone.
+                </p>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                className="px-6 py-2.5 border border-slate-200 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-6 py-2.5 bg-red-600 text-white rounded-xl font-bold text-sm hover:bg-red-700 transition-all shadow-lg shadow-red-100"
+              >
+                Yes, Delete
               </button>
             </div>
           </div>
