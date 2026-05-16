@@ -1,36 +1,230 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 Recruitment CRM – AI Powered Next.js Platform
 
-## Getting Started
+A modern full-stack Recruitment CRM built using **Next.js App Router**, **TypeScript**, **MongoDB**, and **AI-powered workflows**.
 
-First, run the development server:
+The platform provides:
+
+* Candidate Management
+* Job Management
+* AI Resume Enrichment
+* Real-time Dashboard Analytics
+* Server-side Rendering
+* Optimistic UI Updates
+* Modern Next.js Architecture
+
+---
+
+# ✨ Features
+
+## 👥 Candidate Management
+
+* Add, edit, delete candidates
+* AI-powered CV enrichment
+* Candidate filtering and search
+* Resume parsing workflows
+
+---
+
+## 💼 Job Management
+
+* Create and manage job postings
+* Public job board
+* Search and filtering system
+
+---
+
+## 📊 Dashboard Analytics
+
+* Real-time recruitment metrics
+* Interactive dashboard cards
+* Dynamic statistics and insights
+
+---
+
+## 🤖 AI Features
+
+* AI resume analysis
+* Automatic skill extraction
+* Candidate profile enhancement
+* AI-powered search discovery
+
+---
+
+# ⚡ Advanced Next.js Concepts Used
+
+* Next.js App Router
+* Dynamic & Catch-All Routes
+* Parallel & Intercepting Routes
+* Modal Routing Pattern
+* Server Components
+* Client Components
+* Server Actions
+* Async Server-side Data Fetching
+* Optimistic UI
+* Cache Revalidation
+* Progressive Enhancement
+* AI Server-side Processing
+
+---
+
+# ✅ Implementation Highlights
+
+* Secure server-side MongoDB fetching
+* Async Server Components without useEffect
+* Optimistic UI updates using useOptimistic
+* Form loading and validation using useFormStatus & useFormState
+* Cache invalidation using revalidatePath & revalidateTag
+* Real-time fetching using cache: "no-store"
+* AI-powered CV enrichment workflows
+* Intercepted modal routes preserving background state
+
+---
+
+# 📂 Project Structure
+
+```bash
+recruitment-app/
+├── src/
+│   ├── app/
+│   │   ├── (app)/
+│   │   │   ├── @modal/
+│   │   │   ├── candidates/
+│   │   │   ├── dashboard/
+│   │   │   ├── docs/
+│   │   │   ├── jobs/
+│   │   │   ├── search/
+│   │   │   ├── layout.tsx
+│   │   │   └── loading.tsx
+│   │   ├── api/
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   │
+│   ├── components/
+│   │   ├── dashboard/
+│   │   ├── CandidateForm.tsx
+│   │   ├── JobForm.tsx
+│   │   └── Shell.tsx
+│   │
+│   ├── lib/
+│   │   ├── actions.ts
+│   │   ├── api.ts
+│   │   └── db.ts
+│   │
+│   ├── models/
+│   │   ├── Candidate.ts
+│   │   └── Job.ts
+│   │
+│   └── types/
+│       └── index.ts
+│
+├── public/
+├── .env
+├── next.config.mjs
+├── tailwind.config.ts
+└── package.json
+```
+
+---
+
+# 🛠️ Tech Stack
+
+## Frontend
+
+* Next.js 14
+* React 18
+* TypeScript
+* Tailwind CSS
+
+---
+
+## Backend
+
+* Node.js
+* MongoDB
+* Mongoose
+* Server Actions
+
+---
+
+## AI Integration
+
+* Claude / Llama Models
+* Resume Parsing
+* AI Candidate Enrichment
+
+---
+
+# ⚙️ Setup Instructions
+
+## Install Dependencies
+
+```bash
+npm install
+```
+
+---
+
+## Configure Environment Variables
+
+Create `.env` file:
+
+```env
+MONGODB_URI=your_mongodb_url
+AI_API_KEY=your_ai_key
+```
+
+---
+
+## Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# 🌐 Application Flow
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```txt
+User Action
+    ↓
+Server Action
+    ↓
+Database Update
+    ↓
+AI Processing
+    ↓
+Cache Revalidation
+    ↓
+Optimistic UI Update
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+# 🚀 Key Highlights
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+✅ Full-stack Next.js App Router architecture
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+✅ AI-powered recruitment workflows
 
-## Deploy on Vercel
+✅ Server-first rendering strategy
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+✅ Optimistic user experience
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+✅ Real-time cache management
+
+✅ Modern scalable folder structure
+
+✅ Production-ready architecture
+
+---
+
+# 👨‍💻 Author
+
+Suresh 
+
+---
+
+# 📄 License
+
+MIT License
