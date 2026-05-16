@@ -89,30 +89,24 @@ export default function DashboardClient({ stats, jobs, candidates }: { stats: an
   }, [stats.weeklyStats, optimisticCandidates]);
 
   const statCardsData = useMemo(() => [
-    { id: 'total', label: 'Total Applications', value: stats.totalCandidates || 0, data: optimisticCandidates, color: 'text-blue-500' },
-    { id: 'onhold', label: 'On Hold Candidates', value: stats.onHold || 0, data: optimisticCandidates.filter(c => c.status === 'On Hold'), color: 'text-orange-500' },
-    { id: 'shortlisted', label: 'Shortlisted Candidates', value: stats.shortlisted || 0, data: optimisticCandidates.filter(c => c.status === 'Shortlisted'), color: 'text-indigo-500' },
-    { id: 'rejected', label: 'Rejected Candidates', value: stats.rejected || 0, data: optimisticCandidates.filter(c => c.status === 'Rejected'), color: 'text-red-500' },
-  ], [stats, optimisticCandidates]);
+    { id: 'total', label: 'Total Applications', value: optimisticCandidates.length, data: optimisticCandidates, color: 'text-blue-500' },
+    { id: 'onhold', label: 'On Hold Candidates', value: optimisticCandidates.filter(c => c.status === 'On Hold').length, data: optimisticCandidates.filter(c => c.status === 'On Hold'), color: 'text-orange-500' },
+    { id: 'shortlisted', label: 'Shortlisted Candidates', value: optimisticCandidates.filter(c => c.status === 'Shortlisted').length, data: optimisticCandidates.filter(c => c.status === 'Shortlisted'), color: 'text-indigo-500' },
+    { id: 'rejected', label: 'Rejected Candidates', value: optimisticCandidates.filter(c => c.status === 'Rejected').length, data: optimisticCandidates.filter(c => c.status === 'Rejected'), color: 'text-red-500' },
+  ], [optimisticCandidates]);
 
   const acquisitionsData = useMemo(() => {
-    const total = stats.totalCandidates || optimisticCandidates.length || 0;
+    const total = optimisticCandidates.length || 0;
     const getPercent = (count: number) => total ? Math.round((count / total) * 100) : 0;
-    const data = stats.acquisitions || {
-      applications: 100,
-      shortlisted: getPercent(stats.shortlisted || optimisticCandidates.filter(c => c.status === 'Shortlisted').length),
-      rejected: getPercent(stats.rejected || optimisticCandidates.filter(c => c.status === 'Rejected').length),
-      onHold: getPercent(stats.onHold || optimisticCandidates.filter(c => c.status === 'On Hold').length),
-      finalised: getPercent(stats.finalised || optimisticCandidates.filter(c => c.status === 'Finalised').length),
-    };
+    
     return [
-      { label: 'Applications', val: data.applications, color: 'bg-blue-500' },
-      { label: 'Shortlisted', val: data.shortlisted, color: 'bg-amber-400' },
-      { label: 'Rejected', val: data.rejected, color: 'bg-red-500' },
-      { label: 'On Hold', val: data.onHold, color: 'bg-orange-400' },
-      { label: 'Finalised', val: data.finalised, color: 'bg-emerald-500' },
+      { label: 'Applications', val: 100, color: 'bg-blue-500' },
+      { label: 'Shortlisted', val: getPercent(optimisticCandidates.filter(c => c.status === 'Shortlisted').length), color: 'bg-amber-400' },
+      { label: 'Rejected', val: getPercent(optimisticCandidates.filter(c => c.status === 'Rejected').length), color: 'bg-red-500' },
+      { label: 'On Hold', val: getPercent(optimisticCandidates.filter(c => c.status === 'On Hold').length), color: 'bg-orange-400' },
+      { label: 'Finalised', val: getPercent(optimisticCandidates.filter(c => c.status === 'Finalised').length), color: 'bg-emerald-500' },
     ];
-  }, [stats, candidates]);
+  }, [optimisticCandidates]);
 
 
 
@@ -173,7 +167,7 @@ export default function DashboardClient({ stats, jobs, candidates }: { stats: an
         </div>
       </div>
 
-      <DashboardSidebar stats={stats} recentJobs={stats.recentJobs || jobs.slice(0, 3)} />
+      <DashboardSidebar totalCandidates={optimisticCandidates.length} recentJobs={stats.recentJobs || jobs.slice(0, 3)} />
 
       {/* Modal */}
       {activeModal && currentModalData && (

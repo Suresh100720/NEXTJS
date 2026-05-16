@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { getCandidateById } from '@/lib/api';
+import { getCandidateById, getCandidateSummary } from '@/lib/api';
+import { Sparkles } from 'lucide-react';
 
 export default async function CandidateDetailPage({
   params,
@@ -8,8 +9,16 @@ export default async function CandidateDetailPage({
 }) {
   const id = params.id;
   let candidate;
+  let summaryData = { summary: '' };
+
   try {
-    candidate = await getCandidateById(id);
+    // Fetch both candidate details and AI summary in parallel
+    const [cData, sData] = await Promise.all([
+      getCandidateById(id),
+      getCandidateSummary(id).catch(() => ({ summary: 'Summary currently unavailable.' }))
+    ]);
+    candidate = cData;
+    summaryData = sData;
   } catch (error) {
     return (
       <div className="flex flex-col items-center justify-center py-24 px-6 text-center">
@@ -37,18 +46,34 @@ export default async function CandidateDetailPage({
         </div>
         <div className="flex gap-4">
           <a 
-            href={`https://mail.google.com/mail/?view=cm&fs=1&to=${candidate.email}&su=Regarding your application for ${candidate.role}`}
+            href={`https://mail.google.com/mail/?view=cm&fs=1&to=${candidate.email}&su=Interview Invitation for ${candidate.role}&body=Hi ${candidate.name.split(' ')[0]},\n\nWe would like to schedule an interview with you regarding your application for the ${candidate.role} position.`}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-8 py-3 bg-indigo-600 rounded-2xl font-bold text-white hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-100 no-underline active:scale-95"
+            className="px-8 py-3 bg-indigo-600 rounded-2xl font-bold text-white hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-100 no-underline active:scale-95 flex items-center justify-center"
           >
-            Contact Candidate
+            Schedule Interview
           </a>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
+          {/* AI Summary Section */}
+          <section className="bg-white border border-slate-200 p-8 rounded-[32px] shadow-sm relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+              <Sparkles className="w-32 h-32 text-indigo-600" />
+            </div>
+            <div className="flex items-center gap-2 mb-6">
+              <div className="p-2 bg-indigo-50 rounded-lg">
+                <Sparkles className="w-5 h-5 text-indigo-600" />
+              </div>
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">AI Profile Summary</h2>
+            </div>
+            <p className="text-slate-600 leading-relaxed font-medium text-lg">
+              {summaryData.summary}
+            </p>
+          </section>
+
           <section className="bg-white border border-slate-200 p-8 rounded-[32px] shadow-sm">
             <h2 className="text-2xl font-black mb-6 text-slate-900 tracking-tight">Experience</h2>
             <div className="space-y-8">
@@ -89,19 +114,6 @@ export default async function CandidateDetailPage({
                 </span>
               ))}
             </div>
-          </section>
-
-          <section className="bg-gradient-to-br from-indigo-600 to-violet-700 p-8 rounded-[32px] shadow-xl text-white">
-            <h2 className="text-xl font-black mb-4 tracking-tight">Quick Action</h2>
-            <p className="text-indigo-100 text-sm mb-6 font-medium">Ready to move forward? Schedule an interview with {candidate.name.split(' ')[0]} today.</p>
-            <a 
-              href={`https://mail.google.com/mail/?view=cm&fs=1&to=${candidate.email}&su=Interview Invitation for ${candidate.role}&body=Hi ${candidate.name.split(' ')[0]},\n\nWe would like to schedule an interview with you regarding your application for the ${candidate.role} position.`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full py-4 bg-white text-indigo-600 rounded-2xl font-black text-sm shadow-lg hover:bg-indigo-50 transition-all active:scale-95 flex items-center justify-center no-underline"
-            >
-              Schedule Interview
-            </a>
           </section>
         </div>
       </div>

@@ -1,7 +1,13 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
-export async function getJobs() {
-  const res = await fetch(`${BASE_URL}/jobs`, { cache: 'no-store' });
+export async function getJobs(revalidate?: number) {
+  const options: any = { cache: 'no-store' };
+  if (revalidate !== undefined) {
+    delete options.cache;
+    options.next = { revalidate, tags: ['jobs'] };
+  }
+  
+  const res = await fetch(`${BASE_URL}/jobs`, options);
   if (!res.ok) throw new Error('Failed to fetch jobs');
   return res.json();
 }
@@ -85,6 +91,7 @@ export async function deleteCandidates(ids: string[]) {
 }
 
 export async function getStats() {
+  // Stats should remain dynamic (no-store) by default as per requirement
   const res = await fetch(`${BASE_URL}/stats`, { cache: 'no-store' });
   if (!res.ok) throw new Error('Failed to fetch stats');
   return res.json();

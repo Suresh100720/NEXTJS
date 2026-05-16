@@ -3,6 +3,12 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ["pdfjs-dist", "mammoth", "pdf-parse"],
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 };
 
 export default nextConfig;

@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import connectDB from '@/lib/db';
 import Job from '@/models/Job';
 import Candidate from '@/models/Candidate';
@@ -73,6 +73,7 @@ export async function handleCandidateAction(prevState: any, formData: FormData) 
 
     revalidatePath('/candidates');
     revalidatePath('/dashboard');
+    revalidateTag('candidates');
     return { success: true, message: 'Candidate saved successfully' };
   } catch (error: any) {
     return { success: false, message: error.message };
