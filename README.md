@@ -10,6 +10,7 @@ The platform provides:
 * Real-time Dashboard Analytics
 * Server-side Rendering
 * Optimistic UI Updates
+* Streaming AI Search Experience
 * Modern Next.js Architecture
 
 ---
@@ -47,10 +48,13 @@ The platform provides:
 * Automatic skill extraction
 * Candidate profile enhancement
 * AI-powered search discovery
+* Streaming AI-generated summaries
 
 ---
 
 # ⚡ Advanced Next.js Concepts Used
+
+## 🏛️ Routing & Rendering
 
 * Next.js App Router
 * Dynamic & Catch-All Routes
@@ -58,12 +62,52 @@ The platform provides:
 * Modal Routing Pattern
 * Server Components
 * Client Components
-* Server Actions
 * Async Server-side Data Fetching
-* Optimistic UI
-* Cache Revalidation
+* Partial Pre-rendering
+* Streaming UI Rendering
+
+---
+
+## ⚡ Server Actions & Forms
+
+* Server Actions
 * Progressive Enhancement
-* AI Server-side Processing
+* useFormStatus
+* useFormState
+* Optimistic UI
+* useOptimistic
+
+---
+
+## 💾 Caching & Revalidation
+
+* fetch() Caching
+* force-cache
+* no-store
+* next.revalidate
+* next.tags
+* Cache Invalidation
+* revalidatePath
+* revalidateTag
+
+---
+
+## 🎨 Streaming & Suspense UI
+
+* React Suspense
+* Suspense Boundaries
+* App Router Streaming
+* loading.tsx
+* Skeleton UI
+* shadcn Skeleton Components
+
+---
+
+## 🤖 AI Integration
+
+* Claude / Llama Resume Enrichment
+* AI Candidate Analysis
+* Streaming AI Search Summaries
 
 ---
 
@@ -75,6 +119,8 @@ The platform provides:
 * Form loading and validation using useFormStatus & useFormState
 * Cache invalidation using revalidatePath & revalidateTag
 * Real-time fetching using cache: "no-store"
+* Streaming AI-powered search summaries
+* Suspense-based progressive rendering
 * AI-powered CV enrichment workflows
 * Intercepted modal routes preserving background state
 
@@ -84,44 +130,41 @@ The platform provides:
 
 ```bash
 recruitment-app/
-├── src/
-│   ├── app/
-│   │   ├── (app)/
-│   │   │   ├── @modal/
-│   │   │   ├── candidates/
-│   │   │   ├── dashboard/
-│   │   │   ├── docs/
-│   │   │   ├── jobs/
-│   │   │   ├── search/
-│   │   │   ├── layout.tsx
-│   │   │   └── loading.tsx
-│   │   ├── api/
-│   │   ├── layout.tsx
-│   │   └── page.tsx
-│   │
-│   ├── components/
-│   │   ├── dashboard/
-│   │   ├── CandidateForm.tsx
-│   │   ├── JobForm.tsx
-│   │   └── Shell.tsx
-│   │
-│   ├── lib/
-│   │   ├── actions.ts
-│   │   ├── api.ts
-│   │   └── db.ts
-│   │
-│   ├── models/
-│   │   ├── Candidate.ts
-│   │   └── Job.ts
-│   │
-│   └── types/
-│       └── index.ts
-│
-├── public/
-├── .env
-├── next.config.mjs
-├── tailwind.config.ts
-└── package.json
+└── src/
+    ├── app/
+    │   ├── (app)/
+    │   │   ├── @modal/
+    │   │   │   └── (.)candidates/
+    │   │   │       └── [id]/
+    │   │   ├── candidates/
+    │   │   │   └── [[...slug]]/
+    │   │   ├── dashboard/
+    │   │   ├── jobs/
+    │   │   └── search/
+    │   │       ├── [query]/
+    │   │       └── [...query]/
+    │   │
+    │   └── api/
+    │       ├── candidates/
+    │       │   ├── bulk-delete/
+    │       │   └── [id]/
+    │       │       └── summary/
+    │       ├── jobs/
+    │       │   └── [id]/
+    │       ├── search/
+    │       │   └── summary/
+    │       └── stats/
+    │
+    ├── components/
+    │   ├── dashboard/
+    │   └── ui/
+    │
+    ├── lib/
+    │
+    ├── models/
+    │
+    └── types/
+
 ```
 
 ---
@@ -134,6 +177,7 @@ recruitment-app/
 * React 18
 * TypeScript
 * Tailwind CSS
+* shadcn/ui
 
 ---
 
@@ -151,6 +195,7 @@ recruitment-app/
 * Claude / Llama Models
 * Resume Parsing
 * AI Candidate Enrichment
+* Streaming AI Summaries
 
 ---
 
@@ -196,7 +241,9 @@ AI Processing
     ↓
 Cache Revalidation
     ↓
-Optimistic UI Update
+Streaming UI Update
+    ↓
+Optimistic UI Rendering
 ```
 
 ---
@@ -209,9 +256,13 @@ Optimistic UI Update
 
 ✅ Server-first rendering strategy
 
-✅ Optimistic user experience
+✅ Streaming AI search experience
+
+✅ Suspense-based progressive rendering
 
 ✅ Real-time cache management
+
+✅ Optimistic user experience
 
 ✅ Modern scalable folder structure
 
@@ -221,7 +272,7 @@ Optimistic UI Update
 
 # 👨‍💻 Author
 
-Suresh 
+Suresh
 
 ---
 
