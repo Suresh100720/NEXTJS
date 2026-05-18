@@ -15,14 +15,16 @@ export async function GET(req: Request) {
     let jobFilter: any = {};
     let candidateFilter: any = {};
 
+    const escapeRegex = (string: string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
     if (q) {
-      const query = { $regex: q, $options: 'i' };
+      const query = { $regex: '\\b' + escapeRegex(q), $options: 'i' };
       jobFilter.$or = [{ title: query }, { department: query }];
       candidateFilter.$or = [{ name: query }, { role: query }, { skills: query }];
     }
 
     if (role) {
-      const roleQuery = { $regex: role, $options: 'i' };
+      const roleQuery = { $regex: '\\b' + escapeRegex(role), $options: 'i' };
       jobFilter.title = roleQuery;
       candidateFilter.role = roleQuery;
     }
@@ -33,7 +35,7 @@ export async function GET(req: Request) {
     }
 
     if (status) {
-      const statusQuery = { $regex: status, $options: 'i' };
+      const statusQuery = { $regex: '\\b' + escapeRegex(status), $options: 'i' };
       jobFilter.status = statusQuery;
       candidateFilter.status = statusQuery;
     }
