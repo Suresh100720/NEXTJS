@@ -15,7 +15,6 @@ export default function SearchPage({ searchParams }: { searchParams: { [key: str
 
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-top-4 duration-500 pb-20">
-      <h1 className="text-4xl font-black text-slate-900 tracking-tight">Talent Discovery</h1>
 
       {/* Sticky Filters */}
       <SearchFilters initialQ={q} initialRole={role} initialExperience={experience} initialStatus={status} />
