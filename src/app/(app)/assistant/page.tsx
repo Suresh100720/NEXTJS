@@ -8,7 +8,7 @@ import remarkGfm from 'remark-gfm';
 import {
   Sparkles, Send, Loader2, Copy, Database, Search,
   FileText, Mail, FileCode, Check, Bot, User,
-  Zap, Activity
+  Zap, Activity, Trash2
 } from 'lucide-react';
 
 
@@ -27,6 +27,7 @@ export default function AIAssistantPage() {
     sendMessage,
     error: chatError,
     status,
+    setMessages,
   } = useChat({
     transport: new DefaultChatTransport({ api: '/api/assistant' }),
   });
@@ -40,16 +41,26 @@ export default function AIAssistantPage() {
     setChatInput('');
   };
 
+  const handleClearChat = () => {
+    setMessages([]);
+  };
+
   // ── 2. useCompletion hook (Vercel AI SDK) ─────────────────────────────────────
   const {
     completion,
     complete,
     isLoading: completionLoading,
     error: completionError,
+    setCompletion,
   } = useCompletion({
     api: '/api/completion',
     streamProtocol: 'text',
   });
+
+  const handleClearCompletion = () => {
+    setCompletion('');
+    setCompletionInput('');
+  };
 
   // Scroll chat to bottom on new messages
   useEffect(() => {
@@ -82,8 +93,6 @@ export default function AIAssistantPage() {
     { label: 'Mongo · Jobs', query: 'Query MongoDB to count the total number of job listings.', icon: <Database className="w-4 h-4" /> },
   ];
 
-  const safeInput = chatInput;
-
   return (
     <div className="flex h-[calc(100vh-80px)] w-full bg-white rounded-none border-none font-sans overflow-hidden text-slate-800 relative">
 
@@ -106,9 +115,21 @@ export default function AIAssistantPage() {
               <div className="text-[10px] text-slate-600 font-semibold">Groq Llama‑3.3·70B · Tool Calling</div>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-600">
-            <Activity className="w-3.5 h-3.5 animate-pulse" />
-            Live Streaming
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-600">
+              <Activity className="w-3.5 h-3.5 animate-pulse" />
+              Live Streaming
+            </div>
+            {messages.length > 0 && (
+              <button
+                onClick={handleClearChat}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-red-200 bg-slate-50 hover:bg-red-50 text-[10px] font-black uppercase tracking-wider text-slate-600 hover:text-red-600 transition-all shadow-sm active:scale-95 cursor-pointer"
+                title="Clear conversation"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                Clear Chat
+              </button>
+            )}
           </div>
         </div>
 
@@ -151,7 +172,7 @@ export default function AIAssistantPage() {
                       .filter((p: any) => p.type === 'text' || p.type === 'reasoning')
                       .map((p: any) => p.text)
                       .join('')
-                  : m.content ?? '';
+                  : (m as any).content ?? '';
 
                 return (
                   <div key={m.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
@@ -264,17 +285,29 @@ export default function AIAssistantPage() {
       <div className="w-[440px] shrink-0 flex flex-col bg-slate-50 border-l border-slate-200">
 
         {/* Header */}
-        <div className="h-14 px-5 flex items-center gap-3 border-b border-slate-200 bg-white shrink-0">
-          <div className="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center">
-            <Zap className="w-3.5 h-3.5 text-amber-600" />
-          </div>
-          <div>
-            <div className="text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
-              Smart Generator
-              <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-pink-100 text-pink-600 border border-pink-200 uppercase tracking-wide">useCompletion</span>
+        <div className="h-14 px-5 flex items-center justify-between border-b border-slate-200 bg-white shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center">
+              <Zap className="w-3.5 h-3.5 text-amber-600" />
             </div>
-            <div className="text-[10px] text-slate-600 font-semibold">Stream any recruitment copy</div>
+            <div>
+              <div className="text-sm font-extrabold text-slate-900 flex items-center gap-1.5">
+                Smart Generator
+                <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-pink-100 text-pink-600 border border-pink-200 uppercase tracking-wide">useCompletion</span>
+              </div>
+              <div className="text-[10px] text-slate-600 font-semibold">Stream any recruitment copy</div>
+            </div>
           </div>
+          {(completion || completionInput) && (
+            <button
+              onClick={handleClearCompletion}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-red-200 bg-slate-50 hover:bg-red-50 text-[10px] font-black uppercase tracking-wider text-slate-600 hover:text-red-600 transition-all shadow-sm active:scale-95 cursor-pointer"
+              title="Clear template input & output"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              Clear
+            </button>
+          )}
         </div>
 
         <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-5">

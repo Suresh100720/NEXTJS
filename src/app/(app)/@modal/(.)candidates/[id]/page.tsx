@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState } from 'react';
 import { getCandidateById, getCandidateSummary } from '@/lib/api';
 import { Loader2, Sparkles } from 'lucide-react';
 

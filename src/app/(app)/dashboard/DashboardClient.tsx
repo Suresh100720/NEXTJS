@@ -3,7 +3,7 @@
 import { useState, useMemo, useRef, useOptimistic } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { AllCommunityModule, ModuleRegistry, RowSelectionOptions } from 'ag-grid-community';
-import { X, Users, Download, Trash2, AlertCircle } from 'lucide-react';
+import { X, Download, Trash2, AlertCircle } from 'lucide-react';
 import StatCards from '@/components/dashboard/StatCards';
 import ApplicationsChart from '@/components/dashboard/ApplicationsChart';
 import Acquisitions from '@/components/dashboard/Acquisitions';
@@ -236,7 +236,7 @@ export default function DashboardClient({ stats, jobs, candidates }: { stats: an
               <div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">Delete Candidate?</h3>
                 <p className="text-slate-500 text-sm leading-relaxed">
-                  Are you sure you want to delete "{deleteConfirm.name}"? This action cannot be undone.
+                  Are you sure you want to delete &quot;{deleteConfirm.name}&quot;? This action cannot be undone.
                 </p>
               </div>
             </div>

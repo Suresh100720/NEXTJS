@@ -356,20 +356,26 @@ export default function CandidatesClient({ initialCandidates }: { initialCandida
       {/* Skills Floating Card */}
       {popoverData && (
         <div
-          className="fixed z-[100] w-64 bg-white border border-slate-200 rounded-2xl shadow-2xl p-4 animate-in fade-in zoom-in duration-200"
-          style={{ left: `${popoverData.x - 240}px`, top: `${popoverData.y + 25}px` }}
+          className="fixed z-[100] w-56 bg-white border border-slate-200 rounded-2xl shadow-2xl p-3 animate-in fade-in zoom-in duration-200"
+          style={{ left: `${popoverData.x - 180}px`, top: `${popoverData.y + 28}px` }}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex justify-between items-center mb-3">
-            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">All Skills</h4>
-            <button onClick={() => setPopoverData(null)} className="text-slate-300 hover:text-slate-500">✕</button>
+          <div className="flex justify-between items-center mb-2 px-1">
+            <h4 className="text-xs font-black text-slate-800">Skills</h4>
+            <button 
+              onClick={() => setPopoverData(null)} 
+              className="w-5 h-5 flex items-center justify-center bg-slate-50 hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-full transition-all text-[10px]"
+            >
+              ✕
+            </button>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {popoverData.skills.map(s => (
-              <span key={s} className="px-2 py-1 bg-slate-50 text-slate-600 rounded-lg text-xs border border-slate-100 font-medium">{s}</span>
-            ))}
+          
+          {/* Plain comma-separated scrollable skills list */}
+          <div className="max-h-[125px] overflow-y-auto p-2.5 bg-slate-50/50 border border-slate-100 rounded-xl text-xs font-bold text-slate-600 leading-relaxed scrollbar-thin">
+            {popoverData.skills.join(', ')}
           </div>
-          <div className="absolute -top-2 right-4 w-4 h-4 bg-white border-l border-t border-slate-200 rotate-45"></div>
+          
+          <div className="absolute -top-2 right-[22px] w-4 h-4 bg-white border-l border-t border-slate-200 rotate-45"></div>
         </div>
       )}
 

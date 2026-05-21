@@ -1,7 +1,16 @@
 import connectDB from '@/lib/db';
 import Candidate from '@/models/Candidate';
-import CandidatesClient from '../CandidatesClient';
+import nextDynamic from 'next/dynamic';
 import { Suspense } from 'react';
+
+const CandidatesClient = nextDynamic(() => import('../CandidatesClient'), {
+  ssr: false,
+  loading: () => (
+    <div className="p-12 text-center text-slate-400 font-bold bg-white border border-slate-100 rounded-[32px] animate-pulse">
+      Loading Candidate Pipelines...
+    </div>
+  ),
+});
 
 export default async function CandidatesPage({
   params,

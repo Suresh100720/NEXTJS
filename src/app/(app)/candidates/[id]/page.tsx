@@ -19,12 +19,12 @@ export default async function CandidateDetailPage({
     ]);
     candidate = cData;
     summaryData = sData;
-  } catch (error) {
+  } catch {
     return (
       <div className="flex flex-col items-center justify-center py-24 px-6 text-center">
         <div className="bg-red-50 p-8 rounded-[32px] border border-red-100 max-w-md shadow-xl shadow-red-100/20">
           <h2 className="text-2xl font-black text-red-600 mb-2">Something went wrong!</h2>
-          <p className="text-red-500/80 font-bold text-sm mb-8">We couldn't fetch the candidate details. The ID may be invalid or deleted.</p>
+          <p className="text-red-500/80 font-bold text-sm mb-8">We couldn&apos;t fetch the candidate details. The ID may be invalid or deleted.</p>
           <Link href="/candidates" className="px-8 py-3 bg-red-600 text-white rounded-xl font-bold shadow-lg shadow-red-200 transition-all hover:bg-red-700 active:scale-95 inline-block">
             Back to Candidates
           </Link>

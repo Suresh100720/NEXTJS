@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  Menu, X, LayoutDashboard, Briefcase, Users, Search,
-  ChevronLeft, ChevronRight, Bell, Settings, LogOut, User, MessageSquare, Sparkles
+  Menu, LayoutDashboard, Briefcase, Users, Search,
+  LogOut, User, MessageSquare, Sparkles
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 

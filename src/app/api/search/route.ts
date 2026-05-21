@@ -12,8 +12,8 @@ export async function GET(req: Request) {
     const experience = searchParams.get('experience');
     const status = searchParams.get('status');
     
-    let jobFilter: any = {};
-    let candidateFilter: any = {};
+    const jobFilter: any = {};
+    const candidateFilter: any = {};
 
     const escapeRegex = (string: string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 

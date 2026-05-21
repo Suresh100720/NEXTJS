@@ -1,3 +1,0 @@
-COMPANY: Acme Corp
-CEO: John Carter
-SPECIAL PROJECT: Project Apex (A Next-generation AI router built with Python and Rust in 2026, handling 100 million requests daily with a budget of $2.4 Million).

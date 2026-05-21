@@ -35,10 +35,15 @@ export default auth((req) => {
 
   // 4. PROTECTION GUARD: Secure private routes
   const protectedPaths = ["/dashboard", "/candidates", "/jobs", "/search", "/chat", "/assistant"];
-  const isProtectedRoute = protectedPaths.some((path) =>
+  let isProtectedRoute = protectedPaths.some((path) =>
 
     nextUrl.pathname.startsWith(path)
   );
+
+  // Exclude public dynamic OpenGraph images from authentication checks
+  if (nextUrl.pathname.includes("/opengraph-image")) {
+    isProtectedRoute = false;
+  }
 
   if (isProtectedRoute) {
     if (!isLoggedIn) {

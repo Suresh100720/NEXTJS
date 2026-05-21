@@ -123,7 +123,7 @@ export default function ChatMessageList({
                             {children}
                           </li>
                         ),
-                        code: ({ inline, className, children, ...props }: any) => {
+                        code: ({ inline, children, ...props }: any) => {
                           return inline ? (
                             <code
                               className="bg-slate-100 text-slate-900 px-1.5 py-0.5 rounded text-xs font-semibold"

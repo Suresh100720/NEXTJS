@@ -8,7 +8,7 @@ export default function CandidateNotFound() {
       </div>
       <h2 className="text-2xl font-bold text-gray-900 mb-2">Candidate Not Found</h2>
       <p className="text-gray-500 max-w-sm">
-        We couldn't find the candidate you're looking for. They might have been removed or the ID is incorrect.
+        We couldn&apos;t find the candidate you&apos;re looking for. They might have been removed or the ID is incorrect.
       </p>
     </div>
   );

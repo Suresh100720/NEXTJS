@@ -32,7 +32,7 @@ export default function LoginPage() {
         router.push("/dashboard");
         router.refresh();
       }
-    } catch (err: any) {
+    } catch {
       setError("An unexpected error occurred. Please try again.");
       setIsLoading(false);
     }
@@ -44,7 +44,7 @@ export default function LoginPage() {
     try {
       // Trigger OAuth flow (Mocked here; in a real environment this initiates the provider flow)
       await signIn(provider, { callbackUrl: "/dashboard" });
-    } catch (err) {
+    } catch {
       setError(`Failed to sign in with ${provider}.`);
       setIsLoading(false);
     }
@@ -190,7 +190,7 @@ export default function LoginPage() {
           </div>
 
           <div className="mt-8 text-center text-xs font-semibold text-slate-500">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="/register" className="text-blue-400 hover:text-blue-300 transition-colors underline underline-offset-4">
               Register Here
             </Link>

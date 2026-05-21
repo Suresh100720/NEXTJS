@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import { useFormState, useFormStatus } from 'react-dom';
 import { handleCandidateAction, enrichCVAction } from '@/lib/actions';
-import { X, ChevronDown, Check, Sparkles, Loader2, Upload, FileText, AlertCircle } from 'lucide-react';
+import { X, ChevronDown, Check, Loader2, Upload, FileText, AlertCircle } from 'lucide-react';
 
 // CUSTOM CONFIRMATION MODAL (MATCHING SCREENSHOT)
 function ConfirmationModal({ onConfirm, onCancel }: { onConfirm: () => void, onCancel: () => void }) {

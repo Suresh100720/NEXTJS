@@ -61,7 +61,7 @@ export async function POST(req: Request) {
                 .map((p: any) => p.text)
                 .join('')
             : lastMsg?.content ?? "";
-          let responseText = `Hello! I am your premium AI recruitment assistant, powered by Groq Llama 3. 
+          const responseText = `Hello! I am your premium AI recruitment assistant, powered by Groq Llama 3. 
 
 Here is what I analyzed about your query: "${lastUserMessage.substring(0, 60)}${lastUserMessage.length > 60 ? '...' : ''}"
 

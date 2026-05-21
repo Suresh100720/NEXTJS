@@ -22,7 +22,7 @@ export default async function SearchResultsPage({
           ← Back to Search
         </Link>
         <h1 className="text-4xl font-black text-slate-900 tracking-tight">
-          Results for <span className="text-indigo-600">"{query}"</span>
+          Results for <span className="text-indigo-600">&quot;{query}&quot;</span>
         </h1>
         <p className="text-slate-400 font-bold text-sm mt-2 uppercase tracking-widest">
           Found {results.jobs.length} jobs and {results.candidates.length} candidates

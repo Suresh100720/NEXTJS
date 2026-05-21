@@ -1,7 +1,16 @@
 import { getStats, getJobs, getCandidates } from '@/lib/api';
-import DashboardClient from './DashboardClient';
+import nextDynamic from 'next/dynamic';
 import { Metadata } from 'next';
-import { cookies, headers } from 'next/headers';
+import { headers } from 'next/headers';
+
+const DashboardClient = nextDynamic(() => import('./DashboardClient'), {
+  ssr: false,
+  loading: () => (
+    <div className="p-12 text-center text-slate-400 font-bold bg-white border border-slate-100 rounded-[32px] animate-pulse">
+      Loading Recruiter Dashboard...
+    </div>
+  ),
+});
 
 // 1. Force Dynamic: Ensures the page is rendered for every request
 export const dynamic = 'force-dynamic';
@@ -14,9 +23,8 @@ export const metadata: Metadata = {
 };
 
 export default async function DashboardPage() {
-  // Accessing headers() or cookies() automatically makes the page dynamic
-  const headerList = await headers();
-  const userAgent = headerList.get('user-agent');
+  // Accessing headers() automatically makes the page dynamic
+  await headers();
   
   // This timestamp is generated ON THE SERVER at the moment of request
   const serverTime = new Date().toLocaleTimeString();

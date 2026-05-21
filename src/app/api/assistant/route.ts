@@ -118,31 +118,8 @@ async function buildDataResponse(intent: Intent): Promise<string | null> {
       return `${header}\n${rows}`;
     }
   } catch (err: any) {
-    console.warn('⚠️ DB error, using mock fallback:', err.message);
-
-    if (intent.type === 'count') {
-      const n = intent.collection === 'jobs' ? 12 : 42;
-      return `## 📊 MongoDB Count — ${intent.collection}\n\nThere are **${n} ${intent.collection}** in the database.\n\n| Collection | Count |\n|---|---|\n| ${intent.collection} | **${n}** |\n\n> *Note: Showing estimated count (DB temporarily unavailable)*`;
-    }
-
-    if (intent.type === 'search' || intent.type === 'list') {
-      const mockCandidates = [
-        { name: 'John Doe', role: 'Senior React Developer', skills: ['React', 'TypeScript', 'Node.js'], status: 'Active' },
-        { name: 'Jane Smith', role: 'Frontend Engineer', skills: ['React', 'JavaScript', 'CSS'], status: 'Interviewing' },
-        { name: 'Bob Johnson', role: 'Backend Engineer', skills: ['Node.js', 'MongoDB', 'Express'], status: 'Active' },
-      ];
-      const mockJobs = [
-        { title: 'Senior React Developer', department: 'Engineering', type: 'Full-time', status: 'Active' },
-        { title: 'Product Manager', department: 'Product', type: 'Full-time', status: 'Active' },
-        { title: 'DevOps Engineer', department: 'Infrastructure', type: 'Full-time', status: 'Active' },
-      ];
-      const mock = intent.collection === 'jobs' ? mockJobs : mockCandidates;
-      const header = `## 🔍 Elasticsearch — ${intent.collection} *(simulated)*\n`;
-      const rows = mock.map((d: any, i: number) =>
-        intent.collection === 'candidates' ? formatCandidate(d, i, 1.85 - i * 0.1) : formatJob(d, i, 1.85 - i * 0.1)
-      ).join('\n');
-      return `${header}\n${rows}\n\n> *Note: Showing simulated data (DB temporarily unavailable)*`;
-    }
+    console.error('❌ Database error in assistant:', err.message);
+    return `⚠️ **Error**: Unable to retrieve data from MongoDB.\n\n*Details: ${err.message}*\n\nPlease make sure your MongoDB service is started and running on the configured URI (\`mongodb://localhost:27017/recruitment_db\`).`;
   }
 
   return null;
@@ -211,7 +188,7 @@ export async function POST(req: Request) {
     model: groq('llama-3.3-70b-versatile'),
     system: 'You are a helpful Recruitment AI Assistant for HR managers. Be concise.',
     messages: await convertToModelMessages(messages),
-    maxTokens: 400,
+    maxOutputTokens: 400,
   });
 
   return result.toUIMessageStreamResponse();
