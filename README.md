@@ -1,16 +1,16 @@
 # 🚀 Recruitment CRM – AI Powered Next.js Platform
 
-A modern full-stack Recruitment CRM built using **Next.js App Router**, **TypeScript**, **MongoDB**, and **AI-powered workflows**.
+A modern full-stack Recruitment CRM built using **Next.js App Router**, **TypeScript**, **MongoDB**, **TanStack Query**, and **AI-powered workflows**.
 
 The platform provides:
 
 * Candidate Management
 * Job Management
 * AI Resume Enrichment
+* Streaming AI Search
 * Real-time Dashboard Analytics
 * Server-side Rendering
 * Optimistic UI Updates
-* Streaming AI Search Experience
 * Modern Next.js Architecture
 
 ---
@@ -23,14 +23,16 @@ The platform provides:
 * AI-powered CV enrichment
 * Candidate filtering and search
 * Resume parsing workflows
+* Protected dashboard access
 
 ---
 
 ## 💼 Job Management
 
-* Create and manage job postings
-* Public job board
+* Public SEO-optimized job board
+* Dynamic job pages
 * Search and filtering system
+* Dynamic OpenGraph metadata
 
 ---
 
@@ -39,6 +41,7 @@ The platform provides:
 * Real-time recruitment metrics
 * Interactive dashboard cards
 * Dynamic statistics and insights
+* Secure authenticated dashboards
 
 ---
 
@@ -47,41 +50,39 @@ The platform provides:
 * AI resume analysis
 * Automatic skill extraction
 * Candidate profile enhancement
+* Claude-powered streaming chat
 * AI-powered search discovery
-* Streaming AI-generated summaries
+* Streaming AI summaries
 
 ---
 
-# ⚡ Advanced Next.js Concepts Used
+# ⚡ Advanced Next.js Concepts Implemented
 
-## 🏛️ Routing & Rendering
+## 🏛️ Rendering Strategies
 
-* Next.js App Router
-* Dynamic & Catch-All Routes
-* Parallel & Intercepting Routes
-* Modal Routing Pattern
-* Server Components
-* Client Components
-* Async Server-side Data Fetching
+* SSR (Server-Side Rendering)
+* SSG (Static Site Generation)
+* ISR (Incremental Static Regeneration)
+* Dynamic Rendering
 * Partial Pre-rendering
 * Streaming UI Rendering
 
 ---
 
-## ⚡ Server Actions & Forms
+## 🌐 Routing & Navigation
 
-* Server Actions
-* Progressive Enhancement
-* useFormStatus
-* useFormState
-* Optimistic UI
-* useOptimistic
+* Next.js App Router
+* Dynamic Routes
+* Catch-All Routes
+* Parallel Routes
+* Intercepting Routes
+* Modal Routing Pattern
 
 ---
 
-## 💾 Caching & Revalidation
+## ⚡ Data Fetching & Caching
 
-* fetch() Caching
+* fetch() caching
 * force-cache
 * no-store
 * next.revalidate
@@ -89,25 +90,86 @@ The platform provides:
 * Cache Invalidation
 * revalidatePath
 * revalidateTag
+* Route Segment Config
+* dynamic
+* fetchCache
+* runtime
 
 ---
 
-## 🎨 Streaming & Suspense UI
+## 🔐 Authentication & Middleware
+
+* Auth.js (NextAuth v5)
+* Credentials Authentication
+* Google OAuth Login
+* Middleware Route Protection
+* Request Rewriting
+* Redirect Handling
+* Matcher Patterns
+* Protected Dashboard Routes
+* Server-side Sessions
+
+---
+
+## 🧠 AI SDK & Streaming
+
+* Vercel AI SDK
+* useChat
+* useCompletion
+* Streaming UI
+* AI Tool Calling
+* Elasticsearch Tool Calls
+* MongoDB Tool Calls
+* Claude Streaming API
+
+---
+
+## ⚛️ React Streaming & Suspense
 
 * React Suspense
 * Suspense Boundaries
-* App Router Streaming
 * loading.tsx
 * Skeleton UI
 * shadcn Skeleton Components
+* App Router Streaming
 
 ---
 
-## 🤖 AI Integration
+## 🚀 TanStack Query
 
-* Claude / Llama Resume Enrichment
-* AI Candidate Analysis
-* Streaming AI Search Summaries
+* Queries
+* Mutations
+* Query Invalidation
+* Optimistic Updates
+* Hydration
+* Prefetching
+* Dehydration
+
+---
+
+## 🎨 Performance Optimization
+
+* next/image
+* next/font
+* Lazy Loading
+* Core Web Vitals
+* LCP Optimization
+* INP Optimization
+* CLS Prevention
+* React Profiler
+* Lighthouse Auditing
+* Bundle Analysis
+
+---
+
+## 🌍 SEO & Metadata
+
+* Metadata API
+* Dynamic Metadata
+* OpenGraph Images
+* sitemap.ts
+* robots.ts
+* Dynamic SEO Metadata
 
 ---
 
@@ -115,14 +177,19 @@ The platform provides:
 
 * Secure server-side MongoDB fetching
 * Async Server Components without useEffect
+* Streaming AI search results with Suspense
 * Optimistic UI updates using useOptimistic
 * Form loading and validation using useFormStatus & useFormState
+* Protected dashboard routes using middleware and sessions
 * Cache invalidation using revalidatePath & revalidateTag
 * Real-time fetching using cache: "no-store"
-* Streaming AI-powered search summaries
-* Suspense-based progressive rendering
+* Public Job Board using SSG + ISR
+* Dynamic private dashboards using SSR
 * AI-powered CV enrichment workflows
-* Intercepted modal routes preserving background state
+* Streaming Claude AI chat endpoint
+* Suspense-based progressive rendering
+* Dynamic OpenGraph images per job
+* Image optimization and font subsetting
 
 ---
 
@@ -130,43 +197,22 @@ The platform provides:
 
 ```bash
 recruitment-app/
-└── src/
-    ├── app/
-    │   ├── (app)/
-    │   │   ├── @modal/
-    │   │   │   └── (.)candidates/
-    │   │   │       └── [id]/
-    │   │   ├── candidates/
-    │   │   │   └── [[...slug]]/
-    │   │   ├── dashboard/
-    │   │   ├── jobs/
-    │   │   └── search/
-    │   │       ├── [query]/
-    │   │       └── [...query]/
-    │   │
-    │   └── api/
-    │       ├── candidates/
-    │       │   ├── bulk-delete/
-    │       │   └── [id]/
-    │       │       └── summary/
-    │       ├── jobs/
-    │       │   └── [id]/
-    │       ├── search/
-    │       │   └── summary/
-    │       └── stats/
-    │
-    ├── components/
-    │   ├── dashboard/
-    │   └── ui/
-    │
-    ├── lib/
-    │
-    ├── models/
-    │
-    └── types/
-
-```
-
+├── public/                 # Static assets (images, icons)
+├── src/                    # Main Source Code
+│   ├── app/                # App Router (Pages, Layouts & Route Handlers)
+│   │   ├── (app)/          # Core Recruiter Dashboard Page Group
+│   │   ├── api/            # API Route Endpoints (Server-Side Logic)
+│   │   ├── login/          # User Login page
+│   │   ├── register/       # User Registration page
+│   │   └── layout.tsx      # Main application layout, styles & providers
+│   ├── components/         # Reusable UI Components
+│   ├── lib/                # Shared libraries (DB connect, API clients)
+│   ├── models/             # Mongoose schemas (MongoDB Models)
+│   └── types/              # Global TypeScript declarations
+├── next.config.mjs         # Next.js configurations & Bundle Analyzer
+├── package.json            # Node.js dependencies & scripts
+├── seed.js                 # Local MongoDB database seeder script
+└── tsconfig.json           # TypeScript configuration
 ---
 
 # 🛠️ Tech Stack
@@ -178,6 +224,7 @@ recruitment-app/
 * TypeScript
 * Tailwind CSS
 * shadcn/ui
+* TanStack Query
 
 ---
 
@@ -187,15 +234,25 @@ recruitment-app/
 * MongoDB
 * Mongoose
 * Server Actions
+* Route Handlers
+
+---
+
+## Authentication
+
+* Auth.js (NextAuth v5)
+* Credentials Provider
+* Google OAuth
 
 ---
 
 ## AI Integration
 
-* Claude / Llama Models
+* Claude AI
+* Vercel AI SDK
+* Elasticsearch
 * Resume Parsing
 * AI Candidate Enrichment
-* Streaming AI Summaries
 
 ---
 
@@ -215,6 +272,9 @@ Create `.env` file:
 
 ```env
 MONGODB_URI=your_mongodb_url
+AUTH_SECRET=your_secret
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_secret
 AI_API_KEY=your_ai_key
 ```
 
@@ -228,22 +288,24 @@ npm run dev
 
 ---
 
-# 🌐 Application Flow
+# 🌐 Application Architecture Flow
 
 ```txt
 User Action
     ↓
-Server Action
+Middleware Authentication
     ↓
-Database Update
+Server Actions / Route Handlers
     ↓
-AI Processing
+MongoDB / Elasticsearch
+    ↓
+Claude AI Processing
     ↓
 Cache Revalidation
     ↓
-Streaming UI Update
+Streaming UI Rendering
     ↓
-Optimistic UI Rendering
+Optimistic Client Updates
 ```
 
 ---
@@ -254,19 +316,19 @@ Optimistic UI Rendering
 
 ✅ AI-powered recruitment workflows
 
-✅ Server-first rendering strategy
-
-✅ Streaming AI search experience
+✅ Streaming AI chat and search experience
 
 ✅ Suspense-based progressive rendering
 
+✅ Protected dashboard authentication
+
 ✅ Real-time cache management
+
+✅ SEO-optimized public job board
 
 ✅ Optimistic user experience
 
-✅ Modern scalable folder structure
-
-✅ Production-ready architecture
+✅ Production-ready scalable architecture
 
 ---
 
