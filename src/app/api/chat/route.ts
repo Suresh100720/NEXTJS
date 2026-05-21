@@ -27,10 +27,18 @@ export async function POST(req: Request) {
           }
 
           const chatCompletion = await groq.chat.completions.create({
-            messages: messages.map((m: any) => ({
-              role: m.role,
-              content: m.content
-            })),
+            messages: messages.map((m: any) => {
+              const content = m.parts
+                ? m.parts
+                    .filter((p: any) => p.type === 'text' || p.type === 'reasoning')
+                    .map((p: any) => p.text)
+                    .join('')
+                : m.content ?? '';
+              return {
+                role: m.role,
+                content
+              };
+            }),
             model: 'llama-3.3-70b-versatile',
             stream: true,
           });
@@ -46,7 +54,13 @@ export async function POST(req: Request) {
           console.warn("⚠️ Groq streaming failed, falling back to simulated high-fidelity streaming:", err.message);
 
           // Elegant simulated streaming response from "Groq AI" to handle any offline/credentials environment issues gracefully
-          const lastUserMessage = messages[messages.length - 1]?.content || "";
+          const lastMsg = messages[messages.length - 1];
+          const lastUserMessage = lastMsg?.parts
+            ? lastMsg.parts
+                .filter((p: any) => p.type === 'text' || p.type === 'reasoning')
+                .map((p: any) => p.text)
+                .join('')
+            : lastMsg?.content ?? "";
           let responseText = `Hello! I am your premium AI recruitment assistant, powered by Groq Llama 3. 
 
 Here is what I analyzed about your query: "${lastUserMessage.substring(0, 60)}${lastUserMessage.length > 60 ? '...' : ''}"

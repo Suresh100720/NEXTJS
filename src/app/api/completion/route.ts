@@ -28,7 +28,7 @@ export async function POST(req: Request) {
       prompt: `You are a recruitment copywriting assistant.\nDraft professional, polished content for HR teams.\nFormat your output in clean markdown.\n\nTask: ${prompt}`,
     });
 
-    return result.toDataStreamResponse();
+    return result.toTextStreamResponse();
   } catch (err) {
     console.error('⚠️ /api/completion error:', err);
     const message = err instanceof Error ? err.message : 'Unexpected error';
