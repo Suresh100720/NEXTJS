@@ -9,8 +9,8 @@ The platform provides:
 * AI Resume Enrichment
 * Streaming AI Search
 * Real-time Dashboard Analytics
-* Server-side Rendering
 * Optimistic UI Updates
+* Secure Authentication
 * Modern Next.js Architecture
 
 ---
@@ -58,7 +58,7 @@ The platform provides:
 
 # ⚡ Advanced Next.js Concepts Implemented
 
-## 🏛️ Rendering Strategies
+## 🏛️ Rendering & Routing
 
 * SSR (Server-Side Rendering)
 * SSG (Static Site Generation)
@@ -66,11 +66,6 @@ The platform provides:
 * Dynamic Rendering
 * Partial Pre-rendering
 * Streaming UI Rendering
-
----
-
-## 🌐 Routing & Navigation
-
 * Next.js App Router
 * Dynamic Routes
 * Catch-All Routes
@@ -101,7 +96,7 @@ The platform provides:
 
 * Auth.js (NextAuth v5)
 * Credentials Authentication
-* Google OAuth Login
+* Google OAuth
 * Middleware Route Protection
 * Request Rewriting
 * Redirect Handling
@@ -147,6 +142,19 @@ The platform provides:
 
 ---
 
+## 🧪 Testing & Monitoring
+
+* Vitest
+* React Testing Library
+* Mocking Server Actions
+* Playwright E2E Testing
+* Sentry Error Tracking
+* AI Usage Logging
+* Token Usage Monitoring
+* Latency Tracking
+
+---
+
 ## 🎨 Performance Optimization
 
 * next/image
@@ -179,7 +187,7 @@ The platform provides:
 * Async Server Components without useEffect
 * Streaming AI search results with Suspense
 * Optimistic UI updates using useOptimistic
-* Form loading and validation using useFormStatus & useFormState
+* Form validation using useFormStatus & useFormState
 * Protected dashboard routes using middleware and sessions
 * Cache invalidation using revalidatePath & revalidateTag
 * Real-time fetching using cache: "no-store"
@@ -190,6 +198,8 @@ The platform provides:
 * Suspense-based progressive rendering
 * Dynamic OpenGraph images per job
 * Image optimization and font subsetting
+* End-to-end testing with Playwright
+* Error tracking and AI monitoring with Sentry
 
 ---
 
@@ -197,22 +207,65 @@ The platform provides:
 
 ```bash
 recruitment-app/
-├── public/                 # Static assets (images, icons)
-├── src/                    # Main Source Code
-│   ├── app/                # App Router (Pages, Layouts & Route Handlers)
-│   │   ├── (app)/          # Core Recruiter Dashboard Page Group
-│   │   ├── api/            # API Route Endpoints (Server-Side Logic)
-│   │   ├── login/          # User Login page
-│   │   ├── register/       # User Registration page
-│   │   └── layout.tsx      # Main application layout, styles & providers
-│   ├── components/         # Reusable UI Components
-│   ├── lib/                # Shared libraries (DB connect, API clients)
-│   ├── models/             # Mongoose schemas (MongoDB Models)
-│   └── types/              # Global TypeScript declarations
-├── next.config.mjs         # Next.js configurations & Bundle Analyzer
-├── package.json            # Node.js dependencies & scripts
-├── seed.js                 # Local MongoDB database seeder script
-└── tsconfig.json           # TypeScript configuration
+├── playwright/                   # Playwright E2E Test Suite
+│   └── e2e/
+│       └── workflow.spec.ts      # End-to-end user workflow tests
+├── public/                       # Static public assets (SVGs, logos, images)
+│   └── hero-illustration.svg
+├── src/                          # Application Source Code
+│   ├── app/                      # Next.js App Router Structure
+│   │   ├── (app)/                # Private Route Group (Authed Recruiter Shell)
+│   │   │   ├── @modal/           # Parallel routes for dynamic modal overlays
+│   │   │   ├── ai-performance/   # AI Telemetry logs & Sentry testing dashboard
+│   │   │   ├── assistant/        # Copilot AI Recruiter Chatbot interface
+│   │   │   ├── candidates/       # Candidate profiles & CV manual/AI form uploads
+│   │   │   ├── chat/             # Dual-viewport mobile & desktop recruiter chats
+│   │   │   ├── dashboard/        # Recruiter performance metrics & overview
+│   │   │   ├── jobs/             # Job posting, generation, and details
+│   │   │   ├── search/           # Global AI-driven semantic candidate search
+│   │   │   ├── layout.tsx
+│   │   │   └── loading.tsx
+│   │   ├── api/                  # Backend REST API Endpoints (Auth, AI Loggers)
+│   │   │   ├── assistant/
+│   │   │   ├── auth/             # NextAuth routing handlers
+│   │   │   ├── chat/
+│   │   │   ├── completion/
+│   │   │   └── search/
+│   │   ├── login/                # Authentication Sign-In page
+│   │   ├── register/             # Account Registration page
+│   │   ├── globals.css           # Global CSS & Tailwind rules
+│   │   ├── layout.tsx            # Global HTML shell wrapper
+│   │   └── page.tsx              # Welcome Landing page
+│   ├── components/               # Reusable React UI Components
+│   │   ├── __tests__/            # React Testing Library unit tests (Vitest)
+│   │   │   └── CandidateForm.test.tsx
+│   │   ├── ui/                   # Generic primitives (Buttons, Inputs, Modals)
+│   │   ├── CandidateForm.tsx
+│   │   ├── JobForm.tsx
+│   │   └── Shell.tsx             # Shared global responsive layout shell
+│   ├── lib/                      # Core Utility Functions & Helpers
+│   │   ├── actions.ts            # Next.js Server Actions (with Sentry capturing)
+│   │   ├── aiLogger.ts           # Centralized DB logging for LLM performance
+│   │   ├── api.ts                # Client API wrappers
+│   │   ├── db.ts                 # Mongoose/MongoDB connection wrapper
+│   │   └── firebase.ts           # Client-side Firebase init
+│   ├── models/                   # MongoDB Database Schemas
+│   │   ├── AiLog.ts              # Schema for tracking prompt, model & latency
+│   │   ├── Candidate.ts          # Schema for candidates and resume data
+│   │   └── Job.ts                # Schema for job postings
+│   ├── auth.ts                   # NextAuth core configuration
+│   ├── auth.config.ts            # Middleware authentication rules
+│   ├── middleware.ts             # Route-guard middleware (protects shell)
+│   └── instrumentation.ts        # Next.js startup hook (registers Sentry configs)
+├── .env                          # Local Environment Variables & API Keys
+├── next.config.mjs               # Next.js global configuration & Sentry wrappers
+├── sentry.client.config.ts       # Sentry Web Client configurations
+├── sentry.server.config.ts       # Sentry Node.js Server configurations
+├── sentry.edge.config.ts         # Sentry Edge Runtime configurations
+├── vitest.config.ts              # Vitest Runner configurations
+├── playwright.config.ts          # Playwright Test runner configurations
+└── package.json                  # Dependencies, scripts, and package manifests
+
 ---
 
 # 🛠️ Tech Stack
@@ -253,6 +306,16 @@ recruitment-app/
 * Elasticsearch
 * Resume Parsing
 * AI Candidate Enrichment
+
+---
+
+# 🧪 Testing & Monitoring
+
+* Vitest
+* React Testing Library
+* Playwright
+* Sentry
+* AI Usage Monitoring
 
 ---
 
