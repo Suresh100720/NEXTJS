@@ -2,10 +2,13 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Candidate from '@/models/Candidate';
 import Groq from 'groq-sdk';
+import { logAiCall } from '@/lib/aiLogger';
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || '' });
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
+  const startTime = Date.now();
+  let promptText = '';
   try {
     await connectDB();
     const candidate = await Candidate.findById(params.id);
@@ -20,6 +23,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
       Status: ${candidate.status}
       
       The summary should explicitly mention their years of experience and highlight their suitability for the role based on their skills.`;
+      promptText = prompt;
 
       const chatCompletion = await groq.chat.completions.create({
         messages: [
@@ -29,14 +33,67 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
         model: 'llama-3.1-8b-instant',
       });
 
-      return NextResponse.json({ summary: chatCompletion.choices[0]?.message?.content || 'Summary not available.' });
+      const responseText = chatCompletion.choices[0]?.message?.content || 'Summary not available.';
+      const latency = Date.now() - startTime;
+
+      const promptTokens = chatCompletion.usage?.prompt_tokens || Math.ceil(prompt.length / 4);
+      const completionTokens = chatCompletion.usage?.completion_tokens || Math.ceil(responseText.length / 4);
+      const totalTokens = chatCompletion.usage?.total_tokens || (promptTokens + completionTokens);
+
+      await logAiCall({
+        endpoint: `/api/candidates/[id]/summary`,
+        model: 'llama-3.1-8b-instant',
+        prompt: prompt,
+        response: responseText,
+        promptTokens,
+        completionTokens,
+        totalTokens,
+        latencyMs: latency,
+        status: 'success',
+      });
+
+      return NextResponse.json(
+        { summary: responseText },
+        {
+          headers: {
+            'x-ai-endpoint': `/api/candidates/[id]/summary`,
+            'x-ai-model': 'llama-3.1-8b-instant',
+            'x-ai-latency': String(latency),
+            'x-ai-tokens': String(totalTokens),
+          },
+        }
+      );
     } else {
       const expText = candidate.experience ? (candidate.experience === 'Fresher' ? 'Entry-level' : `${candidate.experience}-year experienced`) : 'Professional';
       const skillsText = candidate.skills && candidate.skills.length > 0 ? `with skills in ${candidate.skills.slice(0, 3).join(', ')}` : 'ready for new opportunities';
-      return NextResponse.json({ summary: `${expText} ${candidate.role} ${skillsText}. Currently in the ${candidate.status} stage.` });
+      const summaryText = `${expText} ${candidate.role} ${skillsText}. Currently in the ${candidate.status} stage.`;
+      
+      const latency = Date.now() - startTime;
+      await logAiCall({
+        endpoint: `/api/candidates/[id]/summary (Fallback)`,
+        model: 'llama-3.1-8b-instant (Simulated)',
+        prompt: `Mock summary for candidate ${candidate.name}`,
+        response: summaryText,
+        promptTokens: 0,
+        completionTokens: 0,
+        totalTokens: 0,
+        latencyMs: latency,
+        status: 'success',
+      });
+
+      return NextResponse.json({ summary: summaryText });
     }
-  } catch (error) {
+  } catch (error: any) {
+    const latency = Date.now() - startTime;
     console.error('Groq Error:', error);
+    await logAiCall({
+      endpoint: `/api/candidates/[id]/summary`,
+      model: 'llama-3.1-8b-instant',
+      prompt: promptText || 'Unknown prompt',
+      latencyMs: latency,
+      status: 'error',
+      errorMessage: error.message,
+    });
     return NextResponse.json({ message: 'Failed to generate summary' }, { status: 500 });
   }
 }

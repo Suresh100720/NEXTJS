@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import Groq from 'groq-sdk';
+import { logAiCall } from '@/lib/aiLogger';
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY || '',
@@ -8,12 +9,21 @@ const groq = new Groq({
 export const runtime = 'nodejs';
 
 export async function POST(req: Request) {
+  const startTime = Date.now();
   try {
     const { messages } = await req.json();
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json({ error: 'Messages are required and must be an array.' }, { status: 400 });
     }
+
+    const lastMsg = messages[messages.length - 1];
+    const lastUserMessage = lastMsg?.parts
+      ? lastMsg.parts
+          .filter((p: any) => p.type === 'text' || p.type === 'reasoning')
+          .map((p: any) => p.text)
+          .join('')
+      : lastMsg?.content ?? "";
 
     // 1. Establish the ReadableStream for real-time text-streaming
     const stream = new ReadableStream({
@@ -43,24 +53,35 @@ export async function POST(req: Request) {
             stream: true,
           });
 
+          let fullText = '';
           for await (const chunk of chatCompletion) {
             const content = chunk.choices[0]?.delta?.content || '';
             if (content) {
+              fullText += content;
               controller.enqueue(encoder.encode(content));
             }
           }
           controller.close();
+
+          const latency = Date.now() - startTime;
+          const promptTokens = Math.ceil(lastUserMessage.length / 4);
+          const completionTokens = Math.ceil(fullText.length / 4);
+
+          await logAiCall({
+            endpoint: '/api/chat',
+            model: 'llama-3.3-70b-versatile',
+            prompt: lastUserMessage,
+            response: fullText,
+            promptTokens,
+            completionTokens,
+            totalTokens: promptTokens + completionTokens,
+            latencyMs: latency,
+            status: 'success',
+          });
         } catch (err: any) {
           console.warn("⚠️ Groq streaming failed, falling back to simulated high-fidelity streaming:", err.message);
 
           // Elegant simulated streaming response from "Groq AI" to handle any offline/credentials environment issues gracefully
-          const lastMsg = messages[messages.length - 1];
-          const lastUserMessage = lastMsg?.parts
-            ? lastMsg.parts
-                .filter((p: any) => p.type === 'text' || p.type === 'reasoning')
-                .map((p: any) => p.text)
-                .join('')
-            : lastMsg?.content ?? "";
           const responseText = `Hello! I am your premium AI recruitment assistant, powered by Groq Llama 3. 
 
 Here is what I analyzed about your query: "${lastUserMessage.substring(0, 60)}${lastUserMessage.length > 60 ? '...' : ''}"
@@ -84,6 +105,22 @@ How else can I assist you with candidate evaluation, job placements, or resume p
             } else {
               clearInterval(interval);
               controller.close();
+
+              const latency = Date.now() - startTime;
+              const promptTokens = Math.ceil(lastUserMessage.length / 4);
+              const completionTokens = Math.ceil(responseText.length / 4);
+
+              logAiCall({
+                endpoint: '/api/chat (Simulated Fallback)',
+                model: 'llama-3.3-70b-versatile (Simulated)',
+                prompt: lastUserMessage,
+                response: responseText,
+                promptTokens,
+                completionTokens,
+                totalTokens: promptTokens + completionTokens,
+                latencyMs: latency,
+                status: 'success',
+              });
             }
           }, 35);
         }
@@ -95,10 +132,21 @@ How else can I assist you with candidate evaluation, job placements, or resume p
         'Content-Type': 'text/event-stream; charset=utf-8',
         'Cache-Control': 'no-cache, no-transform',
         'Connection': 'keep-alive',
+        'x-ai-endpoint': '/api/chat',
+        'x-ai-model': 'llama-3.3-70b-versatile',
       },
     });
   } catch (error: any) {
+    const latency = Date.now() - startTime;
     console.error("❌ Error in chat endpoint:", error);
+    logAiCall({
+      endpoint: '/api/chat',
+      model: 'llama-3.3-70b-versatile',
+      prompt: 'Error parsing body',
+      latencyMs: latency,
+      status: 'error',
+      errorMessage: error.message,
+    });
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

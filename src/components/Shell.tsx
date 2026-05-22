@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Menu, LayoutDashboard, Briefcase, Users, Search,
-  LogOut, User, MessageSquare, Sparkles
+  LogOut, User, MessageSquare, Sparkles, Activity
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 
@@ -17,6 +17,7 @@ export default function Shell({ children, modal, session }: { children: React.Re
   const getPageTitle = () => {
     const path = pathname.split('/')[1];
     if (!path) return 'Home';
+    if (path === 'ai-performance') return 'AI Performance & Telemetry';
     return path.charAt(0).toUpperCase() + path.slice(1);
   };
 
@@ -27,6 +28,7 @@ export default function Shell({ children, modal, session }: { children: React.Re
     { name: 'Search', href: '/search', icon: <Search className="w-5 h-5" /> },
     { name: 'AI Chat', href: '/chat', icon: <MessageSquare className="w-5 h-5" /> },
     { name: 'AI Assistant', href: '/assistant', icon: <Sparkles className="w-5 h-5" /> },
+    { name: 'AI Telemetry', href: '/ai-performance', icon: <Activity className="w-5 h-5" /> },
   ];
 
 

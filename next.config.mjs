@@ -2,6 +2,7 @@
 // Concept: Bundle Analyzer → Visualizes JavaScript bundle sizes
 // Run: ANALYZE=true npm run build  (or npm run analyze)
 import bundleAnalyzer from '@next/bundle-analyzer';
+import { withSentryConfig } from '@sentry/nextjs';
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -68,4 +69,19 @@ const nextConfig = {
   },
 };
 
-export default withBundleAnalyzer(nextConfig);
+// Sentry Webpack and Options Configuration
+export default withSentryConfig(
+  withBundleAnalyzer(nextConfig),
+  {
+    silent: true,
+    org: 'recruitment-hub',
+    project: 'recruitment-hub',
+  },
+  {
+    widenClientSandbox: true,
+    tunnelRoute: '/monitoring',
+    hideSourceMaps: true,
+    disableLogger: true,
+    automaticVercelMonitors: true,
+  }
+);

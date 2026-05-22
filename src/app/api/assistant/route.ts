@@ -3,6 +3,7 @@ import { createGroq } from '@ai-sdk/groq';
 import connectDB from '@/lib/db';
 import Job from '@/models/Job';
 import Candidate from '@/models/Candidate';
+import { logAiCall } from '@/lib/aiLogger';
 
 export const runtime = 'nodejs';
 
@@ -126,7 +127,7 @@ async function buildDataResponse(intent: Intent): Promise<string | null> {
 }
 
 // ─── Stream plain text as AI SDK UI message stream ────────────────────────────
-function streamMarkdownDirectly(markdown: string): Response {
+function streamMarkdownDirectly(markdown: string, additionalHeaders?: Record<string, string>): Response {
   const encoder = new TextEncoder();
 
   // Helper to encode one SSE data line
@@ -157,39 +158,97 @@ function streamMarkdownDirectly(markdown: string): Response {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
       'Connection': 'keep-alive',
+      ...additionalHeaders,
     },
   });
 }
 
 // ─── Route Handler ────────────────────────────────────────────────────────────
 export async function POST(req: Request) {
-  const { messages } = await req.json();
+  const startTime = Date.now();
+  let userText = '';
+  try {
+    const { messages } = await req.json();
 
-  // Get the last user message text
-  const lastUserMessage = [...messages].reverse().find((m: any) => m.role === 'user');
-  const userText: string = lastUserMessage?.parts
-    ?.filter((p: any) => p.type === 'text')
-    ?.map((p: any) => p.text)
-    ?.join(' ') ?? lastUserMessage?.content ?? '';
+    // Get the last user message text
+    const lastUserMessage = [...messages].reverse().find((m: any) => m.role === 'user');
+    userText = lastUserMessage?.parts
+      ?.filter((p: any) => p.type === 'text')
+      ?.map((p: any) => p.text)
+      ?.join(' ') ?? lastUserMessage?.content ?? '';
 
-  // Detect intent
-  const intent = detectIntent(userText);
+    // Detect intent
+    const intent = detectIntent(userText);
 
-  // For data intents: build response server-side, stream directly (0 Groq tokens)
-  if (intent.type !== 'general') {
-    const markdown = await buildDataResponse(intent);
-    if (markdown) {
-      return streamMarkdownDirectly(markdown);
+    // For data intents: build response server-side, stream directly (0 Groq tokens)
+    if (intent.type !== 'general') {
+      const markdown = await buildDataResponse(intent);
+      if (markdown) {
+        const latency = Date.now() - startTime;
+        const promptTokens = Math.ceil(userText.length / 4);
+        const completionTokens = Math.ceil(markdown.length / 4);
+        const totalTokens = promptTokens + completionTokens;
+
+        await logAiCall({
+          endpoint: '/api/assistant',
+          model: 'llama-3.3-70b-versatile (local database intent)',
+          prompt: userText,
+          response: markdown,
+          promptTokens,
+          completionTokens,
+          totalTokens,
+          latencyMs: latency,
+          status: 'success',
+        });
+
+        return streamMarkdownDirectly(markdown, {
+          'x-ai-endpoint': '/api/assistant',
+          'x-ai-model': 'llama-3.3-70b-versatile (local database intent)',
+          'x-ai-latency': String(latency),
+          'x-ai-tokens': String(totalTokens),
+        });
+      }
     }
+
+    // For general questions: use Groq with minimal tokens
+    const result = streamText({
+      model: groq('llama-3.3-70b-versatile'),
+      system: 'You are a helpful Recruitment AI Assistant for HR managers. Be concise.',
+      messages: await convertToModelMessages(messages),
+      maxOutputTokens: 400,
+      onFinish: async (event) => {
+        const latency = Date.now() - startTime;
+        await logAiCall({
+          endpoint: '/api/assistant',
+          model: 'llama-3.3-70b-versatile',
+          prompt: userText,
+          response: event.text,
+          promptTokens: event.usage?.promptTokens || 0,
+          completionTokens: event.usage?.completionTokens || 0,
+          totalTokens: event.usage?.totalTokens || 0,
+          latencyMs: latency,
+          status: 'success',
+        });
+      },
+    });
+
+    return result.toUIMessageStreamResponse({
+      headers: {
+        'x-ai-endpoint': '/api/assistant',
+        'x-ai-model': 'llama-3.3-70b-versatile',
+      },
+    });
+  } catch (err: any) {
+    const latency = Date.now() - startTime;
+    console.error('⚠️ /api/assistant error:', err);
+    await logAiCall({
+      endpoint: '/api/assistant',
+      model: 'llama-3.3-70b-versatile',
+      prompt: userText || 'Unknown query',
+      latencyMs: latency,
+      status: 'error',
+      errorMessage: err.message,
+    });
+    return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
-
-  // For general questions: use Groq with minimal tokens
-  const result = streamText({
-    model: groq('llama-3.3-70b-versatile'),
-    system: 'You are a helpful Recruitment AI Assistant for HR managers. Be concise.',
-    messages: await convertToModelMessages(messages),
-    maxOutputTokens: 400,
-  });
-
-  return result.toUIMessageStreamResponse();
 }

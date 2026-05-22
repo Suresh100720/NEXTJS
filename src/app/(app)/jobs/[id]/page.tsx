@@ -19,23 +19,23 @@ interface JobDetailPageProps {
 
 // Department to emoji mapping for visual flair
 const DEPT_ICONS: Record<string, string> = {
-  Engineering:  '⚙️',
-  Design:       '🎨',
-  Product:      '📦',
-  Marketing:    '📣',
-  Sales:        '💼',
-  HR:           '👥',
-  Finance:      '💰',
-  Operations:   '🔧',
-  Data:         '📊',
+  Engineering: '⚙️',
+  Design: '🎨',
+  Product: '📦',
+  Marketing: '📣',
+  Sales: '💼',
+  HR: '👥',
+  Finance: '💰',
+  Operations: '🔧',
+  Data: '📊',
 };
 
 // Status badge styles
 const STATUS_STYLES: Record<string, { bg: string; text: string; border: string }> = {
   'Urgently Hiring': { bg: 'bg-orange-50', text: 'text-orange-600', border: 'border-orange-100' },
-  Hiring:            { bg: 'bg-blue-50',   text: 'text-blue-600',   border: 'border-blue-100'   },
-  Active:            { bg: 'bg-emerald-50',text: 'text-emerald-600',border: 'border-emerald-100'},
-  Closed:            { bg: 'bg-red-50',    text: 'text-red-600',    border: 'border-red-100'    },
+  Hiring: { bg: 'bg-blue-50', text: 'text-blue-600', border: 'border-blue-100' },
+  Active: { bg: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-100' },
+  Closed: { bg: 'bg-red-50', text: 'text-red-600', border: 'border-red-100' },
 };
 
 // ─── Fetch a single job ────────────────────────────────────────────────────
@@ -205,10 +205,10 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
         {/* Details Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
-            { label: 'Type',       value: job.type || 'Full-time',  icon: '💼' },
-            { label: 'Experience', value: expText,                   icon: '⏳' },
-            { label: 'Openings',   value: `${job.openings || 1}`,   icon: '👥' },
-            { label: 'Posted',     value: new Date(job.createdAt || Date.now()).toLocaleDateString(), icon: '📅' },
+            { label: 'Type', value: job.type || 'Full-time', icon: '💼' },
+            { label: 'Experience', value: expText, icon: '⏳' },
+            { label: 'Openings', value: `${job.openings || 1}`, icon: '👥' },
+            { label: 'Posted', value: new Date(job.createdAt || Date.now()).toLocaleDateString(), icon: '📅' },
           ].map((detail) => (
             <div
               key={detail.label}

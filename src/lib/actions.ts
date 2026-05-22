@@ -4,6 +4,8 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import connectDB from '@/lib/db';
 import Job from '@/models/Job';
 import Candidate from '@/models/Candidate';
+import * as Sentry from '@sentry/nextjs';
+import { logAiCall } from '@/lib/aiLogger';
 
 // SERVER ACTION: Job Create/Update
 export async function handleJobAction(prevState: any, formData: FormData) {
@@ -29,6 +31,8 @@ export async function handleJobAction(prevState: any, formData: FormData) {
     revalidatePath('/dashboard');
     return { success: true, message: 'Job saved successfully' };
   } catch (error: any) {
+    console.error('Error in handleJobAction:', error);
+    Sentry.captureException(error);
     return { success: false, message: error.message };
   }
 }
@@ -42,6 +46,8 @@ export async function deleteJobAction(id: string) {
     revalidatePath('/dashboard');
     return { success: true };
   } catch (error: any) {
+    console.error('Error in deleteJobAction:', error);
+    Sentry.captureException(error);
     return { success: false, message: error.message };
   }
 }
@@ -76,6 +82,8 @@ export async function handleCandidateAction(prevState: any, formData: FormData) 
     revalidateTag('candidates');
     return { success: true, message: 'Candidate saved successfully' };
   } catch (error: any) {
+    console.error('Error in handleCandidateAction:', error);
+    Sentry.captureException(error);
     return { success: false, message: error.message };
   }
 }
@@ -89,6 +97,8 @@ export async function deleteCandidateAction(id: string) {
     revalidatePath('/dashboard');
     return { success: true };
   } catch (error: any) {
+    console.error('Error in deleteCandidateAction:', error);
+    Sentry.captureException(error);
     return { success: false, message: error.message };
   }
 }
@@ -132,6 +142,7 @@ export async function enrichCVAction(formData: FormData) {
       return { error: 'No readable text found in the document.' };
     }
 
+    const startTime = Date.now();
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -153,8 +164,52 @@ export async function enrichCVAction(formData: FormData) {
 
     const result = await response.json();
     if (result.error) throw new Error(result.error.message);
-    return JSON.parse(result.choices[0].message.content);
+
+    const contentText = result.choices[0].message.content;
+    const latency = Date.now() - startTime;
+    const promptTokens = result.usage?.prompt_tokens || Math.ceil(cvText.length / 4);
+    const completionTokens = result.usage?.completion_tokens || Math.ceil(contentText.length / 4);
+    const totalTokens = result.usage?.total_tokens || (promptTokens + completionTokens);
+
+    await logAiCall({
+      endpoint: 'enrichCVAction (Server Action)',
+      model: 'llama-3.3-70b-versatile',
+      prompt: `Enriching resume file: ${fileName}`,
+      response: contentText,
+      promptTokens,
+      completionTokens,
+      totalTokens,
+      latencyMs: latency,
+      status: 'success',
+    });
+
+    return JSON.parse(contentText);
   } catch (error: any) {
+    console.error('Error in enrichCVAction:', error);
+    Sentry.captureException(error);
+    
+    // Log failure
+    await logAiCall({
+      endpoint: 'enrichCVAction (Server Action)',
+      model: 'llama-3.3-70b-versatile',
+      prompt: `Enrich resume error path`,
+      latencyMs: 0,
+      status: 'error',
+      errorMessage: error.message,
+    });
+    
     return { error: `Enrichment failed: ${error.message}` };
   }
 }
+
+// SERVER ACTION: Sentry Server-side Error Trigger for Telemetry Dashboard
+export async function triggerSentryServerErrorAction() {
+  try {
+    throw new Error('Simulated backend/server-side exception for Sentry error tracking!');
+  } catch (error: any) {
+    console.error('⚠️ [SENTRY SERVER TEST] Capturing simulated server exception:', error.message);
+    Sentry.captureException(error);
+    return { success: false, message: error.message };
+  }
+}
+

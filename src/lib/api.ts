@@ -6,7 +6,7 @@ export async function getJobs(revalidate?: number) {
     delete options.cache;
     options.next = { revalidate, tags: ['jobs'] };
   }
-  
+
   const res = await fetch(`${BASE_URL}/jobs`, options);
   if (!res.ok) throw new Error('Failed to fetch jobs');
   return res.json();
@@ -103,7 +103,7 @@ export async function searchData(q: string, role?: string, experience?: string, 
   if (role) params.set('role', role);
   if (experience) params.set('experience', experience);
   if (status) params.set('status', status);
-  
+
   const res = await fetch(`${BASE_URL}/search?${params.toString()}`, { cache: 'no-store' });
   if (!res.ok) throw new Error('Failed to search');
   return res.json();

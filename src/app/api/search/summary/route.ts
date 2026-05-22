@@ -1,8 +1,11 @@
 import Groq from 'groq-sdk';
+import { logAiCall } from '@/lib/aiLogger';
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || '' });
 
 export async function POST(req: Request) {
+  const startTime = Date.now();
+  let promptText = '';
   try {
     const { q, role, experience, status } = await req.json();
 
@@ -18,6 +21,7 @@ export async function POST(req: Request) {
       - Status: ${status || 'None'}
       
       Based on this, write a concise, professional 2-sentence summary of what type of talent they are looking for and what action they seem to be taking. Do not start with "The recruiter is looking for...". Start directly with the insight.`;
+    promptText = prompt;
 
     const chatCompletion = await groq.chat.completions.create({
       messages: [{ role: 'user', content: prompt }],
@@ -27,17 +31,63 @@ export async function POST(req: Request) {
 
     const stream = new ReadableStream({
       async start(controller) {
-        for await (const chunk of chatCompletion) {
-          const content = chunk.choices[0]?.delta?.content || '';
-          controller.enqueue(content);
+        let fullText = '';
+        try {
+          for await (const chunk of chatCompletion) {
+            const content = chunk.choices[0]?.delta?.content || '';
+            fullText += content;
+            controller.enqueue(content);
+          }
+          controller.close();
+
+          const latency = Date.now() - startTime;
+          const promptTokens = Math.ceil(prompt.length / 4);
+          const completionTokens = Math.ceil(fullText.length / 4);
+
+          await logAiCall({
+            endpoint: '/api/search/summary',
+            model: 'llama-3.1-8b-instant',
+            prompt: prompt,
+            response: fullText,
+            promptTokens,
+            completionTokens,
+            totalTokens: promptTokens + completionTokens,
+            latencyMs: latency,
+            status: 'success',
+          });
+        } catch (err: any) {
+          const latency = Date.now() - startTime;
+          await logAiCall({
+            endpoint: '/api/search/summary',
+            model: 'llama-3.1-8b-instant',
+            prompt: prompt,
+            latencyMs: latency,
+            status: 'error',
+            errorMessage: err.message,
+          });
+          controller.error(err);
         }
-        controller.close();
       }
     });
 
-    return new Response(stream, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
-  } catch (error) {
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'x-ai-endpoint': '/api/search/summary',
+        'x-ai-model': 'llama-3.1-8b-instant',
+      }
+    });
+  } catch (error: any) {
+    const latency = Date.now() - startTime;
     console.error('AI Summary error:', error);
+    await logAiCall({
+      endpoint: '/api/search/summary',
+      model: 'llama-3.1-8b-instant',
+      prompt: promptText || 'Unknown prompt',
+      latencyMs: latency,
+      status: 'error',
+      errorMessage: error.message,
+    });
     return new Response('Failed to generate summary.', { status: 500 });
   }
 }
