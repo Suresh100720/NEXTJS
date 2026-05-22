@@ -187,6 +187,7 @@ export async function enrichCVAction(formData: FormData) {
   } catch (error: any) {
     console.error('Error in enrichCVAction:', error);
     Sentry.captureException(error);
+    await Sentry.flush(2000); // Flush queue to Sentry
     
     // Log failure
     await logAiCall({
@@ -209,6 +210,7 @@ export async function triggerSentryServerErrorAction() {
   } catch (error: any) {
     console.error('⚠️ [SENTRY SERVER TEST] Capturing simulated server exception:', error.message);
     Sentry.captureException(error);
+    await Sentry.flush(2000); // Force flush event queue to Sentry before returning
     return { success: false, message: error.message };
   }
 }

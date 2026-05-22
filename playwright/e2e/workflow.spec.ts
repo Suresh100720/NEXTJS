@@ -66,8 +66,7 @@ test.describe('Recruitment App E2E Workflow', () => {
     await expect(page.locator('text=Total AI Requests')).toBeVisible();
     await expect(page.locator('text=Average Latency')).toBeVisible();
     
-    // Verify interactive sandbox and inspect instructions exist
+    // Verify interactive sandbox exists
     await expect(page.locator('text=Sentry Integration sandbox')).toBeVisible();
-    await expect(page.locator('text=How to check in Inspect Mode')).toBeVisible();
   });
 });

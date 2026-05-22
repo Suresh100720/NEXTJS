@@ -61,8 +61,8 @@ export default function Shell({ children, modal, session }: { children: React.Re
                 key={item.name}
                 href={item.href}
                 className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all group ${isActive
-                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/20'
-                    : 'hover:bg-slate-900 hover:text-white text-slate-400'
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/20'
+                  : 'hover:bg-slate-900 hover:text-white text-slate-400'
                   } ${isCollapsed ? 'justify-center' : ''}`}
               >
                 <div className={`${isActive ? 'text-white' : 'group-hover:text-white'} transition-colors`}>

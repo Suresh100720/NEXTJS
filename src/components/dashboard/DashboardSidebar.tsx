@@ -11,8 +11,8 @@ export default function DashboardSidebar({ totalCandidates, recentJobs }: { tota
         <div className="space-y-4">
           {recentJobs && recentJobs.length > 0 ? (
             recentJobs.map((job: Job) => (
-              <div 
-                key={job._id || job.id} 
+              <div
+                key={job._id || job.id}
                 className="p-5 rounded-2xl border border-indigo-100/50 bg-indigo-50/30 text-indigo-950 shadow-sm transition-all hover:scale-[1.01] hover:shadow-sm"
               >
                 <div className="text-sm font-black tracking-tight truncate">{job.title}</div>

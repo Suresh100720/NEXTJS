@@ -52,11 +52,10 @@ export default function ChatSidebar({
               <div
                 key={conv.id}
                 onClick={() => onSelectConversation(conv.id)}
-                className={`group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-all relative ${
-                  isActive
+                className={`group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-all relative ${isActive
                     ? "bg-slate-200/70 text-slate-900"
                     : "hover:bg-slate-100 text-slate-600 hover:text-slate-800"
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-2.5 min-w-0 pr-4">
                   <MessageSquare className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-500 shrink-0" />

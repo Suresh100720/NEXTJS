@@ -169,20 +169,19 @@ export default function AIAssistantPage() {
                 const isUser = m.role === 'user';
                 const messageText = m.parts
                   ? m.parts
-                      .filter((p: any) => p.type === 'text' || p.type === 'reasoning')
-                      .map((p: any) => p.text)
-                      .join('')
+                    .filter((p: any) => p.type === 'text' || p.type === 'reasoning')
+                    .map((p: any) => p.text)
+                    .join('')
                   : (m as any).content ?? '';
 
                 return (
                   <div key={m.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
                     <div className={`flex gap-3 max-w-[88%] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
                       {/* Avatar */}
-                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
-                        isUser
+                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${isUser
                           ? 'bg-gradient-to-br from-indigo-600 to-violet-600'
                           : 'bg-slate-100 border border-slate-300'
-                      }`}>
+                        }`}>
                         {isUser
                           ? <User className="w-3.5 h-3.5 text-white" />
                           : <Bot className="w-3.5 h-3.5 text-indigo-600" />}
@@ -190,11 +189,10 @@ export default function AIAssistantPage() {
 
                       {/* Bubble */}
                       <div className="flex flex-col gap-1">
-                        <div className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                          isUser
+                        <div className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${isUser
                             ? 'bg-gradient-to-br from-indigo-600 to-violet-600 text-white rounded-tr-sm'
                             : 'bg-slate-100 border border-slate-200 text-slate-700 rounded-tl-sm'
-                        }`}>
+                          }`}>
                           {messageText && (
                             isUser ? (
                               <div className="whitespace-pre-wrap">{messageText}</div>
@@ -324,11 +322,10 @@ export default function AIAssistantPage() {
                 <button
                   key={t.id}
                   onClick={() => setTemplate(t.id)}
-                  className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl text-[11px] font-bold border transition-all ${
-                    template === t.id
+                  className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl text-[11px] font-bold border transition-all ${template === t.id
                       ? 'bg-indigo-100 border-indigo-300 text-indigo-900'
                       : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300 hover:text-slate-700'
-                  }`}
+                    }`}
                 >
                   {t.icon}
                   {t.label}
@@ -348,8 +345,8 @@ export default function AIAssistantPage() {
                 template === 'offer'
                   ? 'e.g. Offer to Jane Smith, Senior React Dev, £85k, remote-first...'
                   : template === 'rejection'
-                  ? 'e.g. Rejection for John Doe, applied for Backend role, strong but not selected...'
-                  : 'e.g. Senior DevOps Engineer, AWS · Kubernetes · Terraform, 5+ yrs, London...'
+                    ? 'e.g. Rejection for John Doe, applied for Backend role, strong but not selected...'
+                    : 'e.g. Senior DevOps Engineer, AWS · Kubernetes · Terraform, 5+ yrs, London...'
               }
               className="w-full bg-white border border-slate-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 rounded-xl p-3 text-xs text-slate-900 placeholder-slate-500 outline-none transition-all resize-none"
             />

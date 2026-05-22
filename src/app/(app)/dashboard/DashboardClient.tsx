@@ -98,7 +98,7 @@ export default function DashboardClient({ stats, jobs, candidates }: { stats: an
   const acquisitionsData = useMemo(() => {
     const total = optimisticCandidates.length || 0;
     const getPercent = (count: number) => total ? Math.round((count / total) * 100) : 0;
-    
+
     return [
       { label: 'Applications', val: 100, color: 'bg-blue-500' },
       { label: 'Shortlisted', val: getPercent(optimisticCandidates.filter(c => c.status === 'Shortlisted').length), color: 'bg-amber-400' },

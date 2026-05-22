@@ -239,42 +239,6 @@ export default function TelemetryClient({ initialLogs, metrics }: TelemetryClien
         </div>
       </div>
 
-      {/* INSPECT MODE TUTORIAL */}
-      <div className="bg-white border border-slate-200 rounded-[2.5rem] p-8 md:p-10 shadow-sm">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700 border border-slate-200">
-            <Terminal className="w-4 h-4" />
-          </div>
-          <h2 className="text-2xl font-black text-slate-900 tracking-tight">How to check in Inspect Mode (DevTools)</h2>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="space-y-3 p-6 bg-slate-50 rounded-3xl border border-slate-150">
-            <div className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-black text-xs shadow-md">1</div>
-            <h4 className="font-black text-slate-800 text-sm mt-3">Open Browser DevTools</h4>
-            <p className="text-slate-500 text-xs font-bold leading-relaxed">
-              Press <kbd className="px-1.5 py-0.5 bg-white border border-slate-300 rounded shadow-sm text-[10px] font-mono">F12</kbd> or right-click anywhere on the page and select <span className="font-mono text-[11px] text-indigo-600">Inspect</span>. Navigate to the <strong>Console</strong> or <strong>Network</strong> tab.
-            </p>
-          </div>
-
-          <div className="space-y-3 p-6 bg-slate-50 rounded-3xl border border-slate-150">
-            <div className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-black text-xs shadow-md">2</div>
-            <h4 className="font-black text-slate-800 text-sm mt-3">Inspect Network Headers</h4>
-            <p className="text-slate-500 text-xs font-bold leading-relaxed">
-              Trigger any AI feature (e.g. Chat or Candidate enrichment). In the <strong>Network</strong> tab, inspect the response headers to see <code className="text-purple-600 font-mono text-[10px]">x-ai-endpoint</code>, <code className="text-purple-600 font-mono text-[10px]">x-ai-model</code>, and <code className="text-purple-600 font-mono text-[10px]">x-ai-latency</code>!
-            </p>
-          </div>
-
-          <div className="space-y-3 p-6 bg-slate-50 rounded-3xl border border-slate-150">
-            <div className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-black text-xs shadow-md">3</div>
-            <h4 className="font-black text-slate-800 text-sm mt-3">Verify Server Console Logs</h4>
-            <p className="text-slate-500 text-xs font-bold leading-relaxed">
-              Open your terminal window running Next.js. You will see styled server-side logs with a robot avatar detailing latency, prompts, and tokens consumed for each successful model execution!
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* DETAILED LOGS GRID */}
       <div className="bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden shadow-sm">
         {/* Grid Header */}

@@ -24,25 +24,25 @@ export default function AIChatPage() {
   const handleFileSelect = async (file: File) => {
     setIsParsingFile(true);
     setAttachedFileName(file.name);
-    
+
     try {
       const formData = new FormData();
       formData.append("file", file);
-      
+
       const response = await fetch("/api/chat/parse", {
         method: "POST",
         body: formData,
       });
-      
+
       if (!response.ok) {
         throw new Error(await response.text());
       }
-      
+
       const data = await response.json();
       if (data.error) {
         throw new Error(data.error);
       }
-      
+
       setAttachedFileText(data.text);
       console.log("✅ Parsed file successfully");
     } catch (e: any) {
@@ -102,7 +102,7 @@ export default function AIChatPage() {
     if (!textToSend.trim() || isStreaming) return;
 
     const userMessage: Message = { role: "user", content: textToSend };
-    
+
     let currentConversationId = activeId;
     let updatedConversations = [...conversations];
     let activeMessages: Message[] = [];
@@ -130,7 +130,7 @@ export default function AIChatPage() {
         if (c.id === currentConversationId) {
           const newMessages = [...c.messages, userMessage, { role: "assistant" as const, content: "" }];
           activeMessages = newMessages;
-          
+
           const updatedConv = { ...c, messages: newMessages };
           // If a new file is attached during this turn, save it!
           if (attachedFileName && attachedFileText) {
@@ -269,7 +269,7 @@ If the user's query is completely unrelated to the document content (such as ask
 
   return (
     <div className="flex h-[calc(100vh-80px)] w-full bg-white rounded-none border-none font-sans overflow-hidden text-slate-800 relative">
-      
+
       {/* 1. Left History Sidebar Component */}
       <ChatSidebar
         conversations={conversations}
@@ -283,7 +283,7 @@ If the user's query is completely unrelated to the document content (such as ask
 
       {/* 2. Right Chat Main Area */}
       <div className="flex-1 flex flex-col bg-white overflow-hidden">
-        
+
         {/* Simple model bar */}
         <header className="h-14 px-6 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
           <div className="flex items-center gap-2">
@@ -346,3 +346,5 @@ If the user's query is completely unrelated to the document content (such as ask
     </div>
   );
 }
+}
+
