@@ -6,4 +6,13 @@ Sentry.init({
   debug: false,
   replaysOnErrorSampleRate: 1.0,
   replaysSessionSampleRate: 0.1,
+  
+  // Rectify local development HMR/Fast Refresh transient noise
+  ignoreErrors: [
+    "Cannot read properties of null (reading 'useContext')",
+    "reading 'useContext'",
+    "Hydration failed",
+    "Failed to execute 'removeChild' on 'Node'",
+    "Failed to execute 'insertBefore' on 'Node'"
+  ],
 });

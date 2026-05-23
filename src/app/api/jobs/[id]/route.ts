@@ -8,6 +8,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Job from '@/models/Job';
 import { revalidatePath, revalidateTag } from 'next/cache';
+import * as Sentry from '@sentry/nextjs';
 
 // ─── GET /api/jobs/[id] ────────────────────────────────────────────────────
 // Used by:
@@ -27,6 +28,8 @@ export async function GET(
     }
     return NextResponse.json(job);
   } catch (error) {
+    console.error(`API GET /api/jobs/${params.id} failed:`, error);
+    Sentry.captureException(error);
     return NextResponse.json(
       { message: (error as Error).message },
       { status: 500 }
@@ -52,6 +55,8 @@ export async function PUT(
     revalidateTag('jobs');
     return NextResponse.json(job);
   } catch (error) {
+    console.error(`API PUT /api/jobs/${params.id} failed:`, error);
+    Sentry.captureException(error);
     return NextResponse.json(
       { message: (error as Error).message },
       { status: 400 }
@@ -75,6 +80,8 @@ export async function DELETE(
     revalidateTag('jobs');
     return NextResponse.json({ message: 'Job deleted successfully' });
   } catch (error) {
+    console.error(`API DELETE /api/jobs/${params.id} failed:`, error);
+    Sentry.captureException(error);
     return NextResponse.json(
       { message: (error as Error).message },
       { status: 500 }

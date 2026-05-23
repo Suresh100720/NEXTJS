@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import Groq from 'groq-sdk';
 import { logAiCall } from '@/lib/aiLogger';
+import * as Sentry from '@sentry/nextjs';
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY || '',
@@ -80,6 +81,7 @@ export async function POST(req: Request) {
           });
         } catch (err: any) {
           console.warn("⚠️ Groq streaming failed, falling back to simulated high-fidelity streaming:", err.message);
+          Sentry.captureException(err);
 
           // Elegant simulated streaming response from "Groq AI" to handle any offline/credentials environment issues gracefully
           const responseText = `Hello! I am your premium AI recruitment assistant, powered by Groq Llama 3. 
@@ -139,6 +141,7 @@ How else can I assist you with candidate evaluation, job placements, or resume p
   } catch (error: any) {
     const latency = Date.now() - startTime;
     console.error("❌ Error in chat endpoint:", error);
+    Sentry.captureException(error);
     logAiCall({
       endpoint: '/api/chat',
       model: 'llama-3.3-70b-versatile',

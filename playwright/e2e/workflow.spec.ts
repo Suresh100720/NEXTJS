@@ -46,7 +46,7 @@ test.describe('Recruitment App E2E Workflow', () => {
     
     // We click and wait for the natural redirect to happen once NextAuth completes
     await submitBtn.click();
-    await page.waitForURL('**/dashboard', { timeout: 20000 });
+    await expect(page).toHaveURL(/.*dashboard/, { timeout: 20000 });
     
     // Verify that the navigation shell is rendered
     const sidebar = page.locator('aside');

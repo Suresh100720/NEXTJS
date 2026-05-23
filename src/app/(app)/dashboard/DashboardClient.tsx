@@ -6,7 +6,7 @@ import { AllCommunityModule, ModuleRegistry, RowSelectionOptions } from 'ag-grid
 import { X, Download, Trash2, AlertCircle } from 'lucide-react';
 import StatCards from '@/components/dashboard/StatCards';
 import ApplicationsChart from '@/components/dashboard/ApplicationsChart';
-import Acquisitions from '@/components/dashboard/Acquisitions';
+import Applicants from '@/components/dashboard/Applicants';
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
 import { deleteCandidateAction } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
@@ -95,7 +95,7 @@ export default function DashboardClient({ stats, jobs, candidates }: { stats: an
     { id: 'rejected', label: 'Rejected Candidates', value: optimisticCandidates.filter(c => c.status === 'Rejected').length, data: optimisticCandidates.filter(c => c.status === 'Rejected'), color: 'text-red-500' },
   ], [optimisticCandidates]);
 
-  const acquisitionsData = useMemo(() => {
+  const applicantsData = useMemo(() => {
     const total = optimisticCandidates.length || 0;
     const getPercent = (count: number) => total ? Math.round((count / total) * 100) : 0;
 
@@ -163,7 +163,7 @@ export default function DashboardClient({ stats, jobs, candidates }: { stats: an
 
         <div className="grid grid-cols-3 gap-8">
           <ApplicationsChart data={barData} />
-          <Acquisitions data={acquisitionsData} />
+          <Applicants data={applicantsData} />
         </div>
       </div>
 

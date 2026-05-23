@@ -1,6 +1,7 @@
 import { streamText } from 'ai';
 import { createGroq } from '@ai-sdk/groq';
 import { logAiCall } from '@/lib/aiLogger';
+import * as Sentry from '@sentry/nextjs';
 
 export const runtime = 'nodejs';
 
@@ -37,9 +38,9 @@ export async function POST(req: Request) {
           model: 'llama-3.3-70b-versatile',
           prompt: prompt,
           response: event.text,
-          promptTokens: event.usage?.promptTokens || 0,
-          completionTokens: event.usage?.completionTokens || 0,
-          totalTokens: event.usage?.totalTokens || 0,
+          promptTokens: (event.usage as any)?.promptTokens || 0,
+          completionTokens: (event.usage as any)?.completionTokens || 0,
+          totalTokens: (event.usage as any)?.totalTokens || 0,
           latencyMs: latency,
           status: 'success',
         });
@@ -55,6 +56,7 @@ export async function POST(req: Request) {
   } catch (err: any) {
     const latency = Date.now() - startTime;
     console.error('⚠️ /api/completion error:', err);
+    Sentry.captureException(err);
     await logAiCall({
       endpoint: '/api/completion',
       model: 'llama-3.3-70b-versatile',

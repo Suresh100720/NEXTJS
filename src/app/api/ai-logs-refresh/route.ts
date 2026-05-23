@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import AiLog from '@/models/AiLog';
+import * as Sentry from '@sentry/nextjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,6 +22,8 @@ export async function GET() {
     
     return NextResponse.json({ logs: serializedLogs });
   } catch (error: any) {
+    console.error('API GET /api/ai-logs-refresh failed:', error);
+    Sentry.captureException(error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Candidate from '@/models/Candidate';
 import { z } from 'zod';
+import * as Sentry from '@sentry/nextjs';
 
 // Zod Schema for type-safe validation
 const CandidateCreateSchema = z.object({
@@ -20,6 +21,8 @@ export async function GET() {
     const candidates = await Candidate.find().sort({ createdAt: -1 });
     return NextResponse.json(candidates);
   } catch (error) {
+    console.error('API GET /api/candidates failed:', error);
+    Sentry.captureException(error);
     return NextResponse.json({ message: (error as Error).message }, { status: 500 });
   }
 }
@@ -42,10 +45,12 @@ export async function POST(req: Request) {
     const savedCandidate = await candidate.save();
     return NextResponse.json(savedCandidate, { status: 201 });
   } catch (error: any) {
+    console.error('API POST /api/candidates failed:', error);
     // Handle duplicate key error for email
     if (error.code === 11000) {
       return NextResponse.json({ message: 'A candidate with this email already exists.' }, { status: 409 });
     }
+    Sentry.captureException(error);
     return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }

@@ -4,6 +4,7 @@ import connectDB from '@/lib/db';
 import Job from '@/models/Job';
 import Candidate from '@/models/Candidate';
 import { logAiCall } from '@/lib/aiLogger';
+import * as Sentry from '@sentry/nextjs';
 
 export const runtime = 'nodejs';
 
@@ -120,6 +121,7 @@ async function buildDataResponse(intent: Intent): Promise<string | null> {
     }
   } catch (err: any) {
     console.error('❌ Database error in assistant:', err.message);
+    Sentry.captureException(err);
     return `⚠️ **Error**: Unable to retrieve data from MongoDB.\n\n*Details: ${err.message}*\n\nPlease make sure your MongoDB service is started and running on the configured URI (\`mongodb://localhost:27017/recruitment_db\`).`;
   }
 
@@ -223,9 +225,9 @@ export async function POST(req: Request) {
           model: 'llama-3.3-70b-versatile',
           prompt: userText,
           response: event.text,
-          promptTokens: event.usage?.promptTokens || 0,
-          completionTokens: event.usage?.completionTokens || 0,
-          totalTokens: event.usage?.totalTokens || 0,
+          promptTokens: (event.usage as any)?.promptTokens || 0,
+          completionTokens: (event.usage as any)?.completionTokens || 0,
+          totalTokens: (event.usage as any)?.totalTokens || 0,
           latencyMs: latency,
           status: 'success',
         });
@@ -241,6 +243,7 @@ export async function POST(req: Request) {
   } catch (err: any) {
     const latency = Date.now() - startTime;
     console.error('⚠️ /api/assistant error:', err);
+    Sentry.captureException(err);
     await logAiCall({
       endpoint: '/api/assistant',
       model: 'llama-3.3-70b-versatile',

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Candidate from '@/models/Candidate';
+import * as Sentry from '@sentry/nextjs';
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   try {
@@ -9,6 +10,8 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     if (!candidate) return NextResponse.json({ message: 'Candidate not found' }, { status: 404 });
     return NextResponse.json(candidate);
   } catch (error) {
+    console.error(`API GET /api/candidates/${params.id} failed:`, error);
+    Sentry.captureException(error);
     return NextResponse.json({ message: (error as Error).message }, { status: 500 });
   }
 }
@@ -21,6 +24,8 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     if (!candidate) return NextResponse.json({ message: 'Candidate not found' }, { status: 404 });
     return NextResponse.json(candidate);
   } catch (error) {
+    console.error(`API PUT /api/candidates/${params.id} failed:`, error);
+    Sentry.captureException(error);
     return NextResponse.json({ message: (error as Error).message }, { status: 400 });
   }
 }
@@ -32,6 +37,8 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
     if (!candidate) return NextResponse.json({ message: 'Candidate not found' }, { status: 404 });
     return NextResponse.json({ message: 'Candidate deleted successfully' });
   } catch (error) {
+    console.error(`API DELETE /api/candidates/${params.id} failed:`, error);
+    Sentry.captureException(error);
     return NextResponse.json({ message: (error as Error).message }, { status: 500 });
   }
 }

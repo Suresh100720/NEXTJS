@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import * as Sentry from '@sentry/nextjs';
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,6 +28,8 @@ export async function POST(req: NextRequest) {
         }
         extractedText = fullText.trim();
       } catch (err: any) {
+        console.error("PDF extraction failed:", err);
+        Sentry.captureException(err);
         return NextResponse.json(
           { error: `PDF extraction failed: ${err.message}` },
           { status: 500 }
@@ -38,6 +41,8 @@ export async function POST(req: NextRequest) {
         const result = await mammoth.extractRawText({ buffer });
         extractedText = result.value || "";
       } catch (err: any) {
+        console.error("DOCX extraction failed:", err);
+        Sentry.captureException(err);
         return NextResponse.json(
           { error: `DOCX extraction failed: ${err.message}` },
           { status: 500 }
@@ -62,6 +67,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (error: any) {
     console.error("❌ Parse Error:", error);
+    Sentry.captureException(error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

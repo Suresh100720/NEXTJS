@@ -3,6 +3,7 @@ import connectDB from '@/lib/db';
 import Candidate from '@/models/Candidate';
 import Groq from 'groq-sdk';
 import { logAiCall } from '@/lib/aiLogger';
+import * as Sentry from '@sentry/nextjs';
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || '' });
 
@@ -86,6 +87,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   } catch (error: any) {
     const latency = Date.now() - startTime;
     console.error('Groq Error:', error);
+    Sentry.captureException(error);
     await logAiCall({
       endpoint: `/api/candidates/[id]/summary`,
       model: 'llama-3.1-8b-instant',

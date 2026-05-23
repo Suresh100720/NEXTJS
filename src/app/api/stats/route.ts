@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Job from '@/models/Job';
 import Candidate from '@/models/Candidate';
+import * as Sentry from '@sentry/nextjs';
 
 export async function GET() {
   try {
@@ -14,7 +15,7 @@ export async function GET() {
     const finalised = await Candidate.countDocuments({ status: 'Finalised' });
     const screening = await Candidate.countDocuments({ status: 'Screening' });
 
-    const acquisitions = {
+    const applicants = {
       applications: 100,
       shortlisted: totalCandidates ? Math.round((shortlisted / totalCandidates) * 100) : 0,
       rejected: totalCandidates ? Math.round((rejected / totalCandidates) * 100) : 0,
@@ -65,11 +66,13 @@ export async function GET() {
       rejected,
       finalised,
       screening,
-      acquisitions,
+      applicants,
       weeklyStats,
       recentJobs
     });
   } catch (error) {
+    console.error('API GET /api/stats failed:', error);
+    Sentry.captureException(error);
     return NextResponse.json({ message: (error as Error).message }, { status: 500 });
   }
 }

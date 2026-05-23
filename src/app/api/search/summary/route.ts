@@ -1,5 +1,6 @@
 import Groq from 'groq-sdk';
 import { logAiCall } from '@/lib/aiLogger';
+import * as Sentry from '@sentry/nextjs';
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || '' });
 
@@ -57,6 +58,8 @@ export async function POST(req: Request) {
           });
         } catch (err: any) {
           const latency = Date.now() - startTime;
+          console.error('AI Summary stream reading error:', err);
+          Sentry.captureException(err);
           await logAiCall({
             endpoint: '/api/search/summary',
             model: 'llama-3.1-8b-instant',
@@ -80,6 +83,7 @@ export async function POST(req: Request) {
   } catch (error: any) {
     const latency = Date.now() - startTime;
     console.error('AI Summary error:', error);
+    Sentry.captureException(error);
     await logAiCall({
       endpoint: '/api/search/summary',
       model: 'llama-3.1-8b-instant',

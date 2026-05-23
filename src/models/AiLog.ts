@@ -1,6 +1,6 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
-export interface IAiLog extends Document {
+export interface IAiLog {
   endpoint: string;
   model: string;
   prompt: string;

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Job from '@/models/Job';
 import Candidate from '@/models/Candidate';
+import * as Sentry from '@sentry/nextjs';
 
 export async function GET(req: Request) {
   try {
@@ -50,6 +51,8 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ jobs, candidates });
   } catch (error) {
+    console.error('API GET /api/search failed:', error);
+    Sentry.captureException(error);
     return NextResponse.json({ message: (error as Error).message }, { status: 500 });
   }
 }

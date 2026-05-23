@@ -1,5 +1,6 @@
 import connectDB from '@/lib/db';
 import Job from '@/models/Job';
+import * as Sentry from '@sentry/nextjs';
 
 // Node.js runtime allows us to query MongoDB directly
 export const runtime = 'nodejs';
@@ -127,6 +128,8 @@ export async function GET(
       },
     });
   } catch (error) {
+    console.error(`API GET /api/jobs/${params.id}/og failed:`, error);
+    Sentry.captureException(error);
     return new Response(
       `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
         <rect width="100%" height="100%" fill="#ef4444" />
