@@ -80,51 +80,19 @@ export async function POST(req: Request) {
             status: 'success',
           });
         } catch (err: any) {
-          console.warn("⚠️ Groq streaming failed, falling back to simulated high-fidelity streaming:", err.message);
+          console.error("⚠️ Groq streaming failed, propagating error:", err.message);
           Sentry.captureException(err);
+          
+          await logAiCall({
+            endpoint: '/api/chat',
+            model: 'llama-3.3-70b-versatile',
+            prompt: lastUserMessage,
+            latencyMs: Date.now() - startTime,
+            status: 'error',
+            errorMessage: err.message,
+          });
 
-          // Elegant simulated streaming response from "Groq AI" to handle any offline/credentials environment issues gracefully
-          const responseText = `Hello! I am your premium AI recruitment assistant, powered by Groq Llama 3. 
-
-Here is what I analyzed about your query: "${lastUserMessage.substring(0, 60)}${lastUserMessage.length > 60 ? '...' : ''}"
-
-### Advanced Hiring Insights
-1. **Dynamic Candidate Evaluation**: By utilizing structured MongoDB data alongside Next.js routing, our matching scores are compiled dynamically.
-2. **Type-Safe Pipelines**: Zod schemas validate every CRUD operation.
-3. **Session Guards**: Auth.js handles routing and middleware controls seamlessly.
-
-How else can I assist you with candidate evaluation, job placements, or resume parsing today?`;
-
-          // Chunk stream simulating network delay
-          const chunkSize = 8;
-          let offset = 0;
-
-          const interval = setInterval(() => {
-            if (offset < responseText.length) {
-              const chunk = responseText.slice(offset, offset + chunkSize);
-              controller.enqueue(encoder.encode(chunk));
-              offset += chunkSize;
-            } else {
-              clearInterval(interval);
-              controller.close();
-
-              const latency = Date.now() - startTime;
-              const promptTokens = Math.ceil(lastUserMessage.length / 4);
-              const completionTokens = Math.ceil(responseText.length / 4);
-
-              logAiCall({
-                endpoint: '/api/chat (Simulated Fallback)',
-                model: 'llama-3.3-70b-versatile (Simulated)',
-                prompt: lastUserMessage,
-                response: responseText,
-                promptTokens,
-                completionTokens,
-                totalTokens: promptTokens + completionTokens,
-                latencyMs: latency,
-                status: 'success',
-              });
-            }
-          }, 35);
+          controller.error(err);
         }
       }
     });
