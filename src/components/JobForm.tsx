@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
-import { handleJobAction } from '@/lib/actions';
 import { ChevronDown, ChevronUp, X, Loader2, Check, AlertCircle } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { createJob, updateJob } from '@/lib/api';
 
 // CUSTOM CONFIRMATION MODAL (MATCHING SCREENSHOT)
 function ConfirmationModal({ onConfirm, onCancel }: { onConfirm: () => void, onCancel: () => void }) {
@@ -90,8 +90,7 @@ function CustomSelect({ name, value, options, placeholder, onChange, required }:
   );
 }
 
-function SubmitButton({ isEdit }: { isEdit: boolean }) {
-  const { pending } = useFormStatus();
+function SubmitButton({ isEdit, pending }: { isEdit: boolean; pending: boolean }) {
   return (
     <button
       type="submit"
@@ -109,8 +108,8 @@ function SubmitButton({ isEdit }: { isEdit: boolean }) {
 }
 
 export default function JobForm({ onClose, jobToEdit }: { onClose: () => void, jobToEdit?: any }) {
-  const [state, formAction] = useFormState(handleJobAction, null);
-  
+  const queryClient = useQueryClient();
+
   const [title, setTitle] = useState(jobToEdit?.title || '');
   const [department, setDepartment] = useState(jobToEdit?.department || '');
   const [type, setType] = useState(jobToEdit?.type || '');
@@ -119,9 +118,74 @@ export default function JobForm({ onClose, jobToEdit }: { onClose: () => void, j
   const [status, setStatus] = useState(jobToEdit?.status || '');
   const [showConfirmClose, setShowConfirmClose] = useState(false);
 
-  useEffect(() => {
-    if (state?.success) onClose();
-  }, [state, onClose]);
+  // 1. MUTATIONS & OPTIMISTIC UPDATES: Create or Update a Job listing
+  const jobMutation = useMutation({
+    mutationFn: async (jobData: any) => {
+      if (jobToEdit?._id) {
+        return updateJob(jobToEdit._id, jobData);
+      } else {
+        return createJob(jobData);
+      }
+    },
+    // Optimistic update logic
+    onMutate: async (newJobData) => {
+      // Cancel outgoing refetches (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({ queryKey: ['jobs'] });
+
+      // Snapshot the previous query data
+      const previousJobs = queryClient.getQueryData<any[]>(['jobs']) || [];
+
+      // Create an optimistic representation of the updated or new job
+      const optimisticJob = {
+        _id: jobToEdit?._id || 'temp-id-' + Date.now(),
+        createdAt: new Date().toISOString(),
+        ...newJobData,
+      };
+
+      if (jobToEdit?._id) {
+        // Optimistic Edit: Swap the updated job in the list immediately
+        queryClient.setQueryData<any[]>(['jobs'], (old) =>
+          old ? old.map((job) => (job._id === jobToEdit._id ? optimisticJob : job)) : []
+        );
+      } else {
+        // Optimistic Create: Prepend the new job to the list immediately
+        queryClient.setQueryData<any[]>(['jobs'], (old) =>
+          old ? [optimisticJob, ...old] : [optimisticJob]
+        );
+      }
+
+      // Return context with the snapshotted value to rollback if it fails
+      return { previousJobs };
+    },
+    // If the mutation fails, use the context returned from onMutate to rollback
+    onError: (err, newJobData, context) => {
+      if (context?.previousJobs) {
+        queryClient.setQueryData(['jobs'], context.previousJobs);
+      }
+    },
+    // Always refetch or invalidate after success or error to keep server in sync
+    onSettled: () => {
+      // 2. QUERY INVALIDATION: Invalidate the jobs cache so it fetches the actual DB records
+      queryClient.invalidateQueries({ queryKey: ['jobs'] });
+    },
+    onSuccess: () => {
+      onClose();
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title || !department || !status || !type || !experience) return;
+
+    jobMutation.mutate({
+      title,
+      department,
+      status,
+      type,
+      experience,
+      openings: Number(openings),
+    });
+  };
 
   const isDirty = () => {
     if (jobToEdit) {
@@ -175,16 +239,14 @@ export default function JobForm({ onClose, jobToEdit }: { onClose: () => void, j
               <p className="text-sm font-bold text-slate-500">{jobToEdit ? 'Update job details below' : 'Specify the details for the new job listing.'}</p>
             </div>
             
-            {state?.success === false && (
+            {jobMutation.isError && (
               <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl text-sm font-bold flex items-center gap-3">
                 <div className="w-6 h-6 rounded-lg bg-white flex items-center justify-center shadow-sm"><X className="w-3.5 h-3.5" /></div>
-                {state.message}
+                {(jobMutation.error as Error).message || 'Something went wrong'}
               </div>
             )}
 
-            <form action={formAction} className="space-y-6">
-              <input type="hidden" name="id" value={jobToEdit?._id || ''} />
-              
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-bold text-slate-700 mb-2 ml-1">Role / Title</label>
@@ -228,7 +290,7 @@ export default function JobForm({ onClose, jobToEdit }: { onClose: () => void, j
 
               <div className="flex flex-col sm:flex-row gap-3 pt-6">
                 <button type="button" onClick={handleCloseRequest} className="flex-1 px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm uppercase tracking-wider transition-all border border-slate-200 active:scale-95">Cancel</button>
-                <SubmitButton isEdit={!!jobToEdit} />
+                <SubmitButton isEdit={!!jobToEdit} pending={jobMutation.isPending} />
               </div>
             </form>
           </div>

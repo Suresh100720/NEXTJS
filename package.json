@@ -9,9 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ai-sdk/groq": "^3.0.39",
+    "@ai-sdk/react": "^3.0.187",
+    "@tanstack/react-query": "^5.100.11",
+    "@tanstack/react-query-devtools": "^5.100.11",
     "@ungap/with-resolvers": "^0.1.0",
     "ag-grid-community": "^35.3.0",
     "ag-grid-react": "^35.3.0",
+    "ai": "^6.0.185",
     "bootstrap": "^5.3.8",
     "firebase": "^12.13.0",
     "groq-sdk": "^1.2.0",

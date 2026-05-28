@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Menu, X, LayoutDashboard, Briefcase, Users, Search,
-  ChevronLeft, ChevronRight, Bell, Settings, LogOut, User, MessageSquare
+  ChevronLeft, ChevronRight, Bell, Settings, LogOut, User, MessageSquare, Sparkles
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 
@@ -26,7 +26,9 @@ export default function Shell({ children, modal, session }: { children: React.Re
     { name: 'Candidates', href: '/candidates', icon: <Users className="w-5 h-5" /> },
     { name: 'Search', href: '/search', icon: <Search className="w-5 h-5" /> },
     { name: 'AI Chat', href: '/chat', icon: <MessageSquare className="w-5 h-5" /> },
+    { name: 'AI Assistant', href: '/assistant', icon: <Sparkles className="w-5 h-5" /> },
   ];
+
 
   return (
     <div className="flex h-screen bg-[#F8FAFC] overflow-hidden">
@@ -122,8 +124,8 @@ export default function Shell({ children, modal, session }: { children: React.Re
         </header>
 
         {/* Scrolling Page Content */}
-        <main className={`flex-1 overflow-y-auto ${pathname === '/chat' ? 'p-0' : 'p-8'}`}>
-          <div className={pathname === '/chat' ? 'w-full h-full' : 'max-w-[1600px] mx-auto pb-12'}>
+        <main className={`flex-1 overflow-y-auto ${pathname === '/chat' || pathname === '/assistant' ? 'p-0' : 'p-8'}`}>
+          <div className={pathname === '/chat' || pathname === '/assistant' ? 'w-full h-full' : 'max-w-[1600px] mx-auto pb-12'}>
             {children}
             {modal}
           </div>
@@ -132,3 +134,4 @@ export default function Shell({ children, modal, session }: { children: React.Re
     </div>
   );
 }
+

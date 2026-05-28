@@ -34,8 +34,9 @@ export default auth((req) => {
   }
 
   // 4. PROTECTION GUARD: Secure private routes
-  const protectedPaths = ["/dashboard", "/candidates", "/jobs", "/search", "/chat"];
+  const protectedPaths = ["/dashboard", "/candidates", "/jobs", "/search", "/chat", "/assistant"];
   const isProtectedRoute = protectedPaths.some((path) =>
+
     nextUrl.pathname.startsWith(path)
   );
 
